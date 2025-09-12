@@ -46,4 +46,4 @@ Thumbs.db
 
 # Medusa specific
 .medusa/
-uploads/
+uploads/cookies.txt
