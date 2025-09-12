@@ -21,7 +21,8 @@
   "type": "commonjs",
   "dependencies": {
     "@medusajs/framework": "^2.10.1",
-    "@medusajs/medusa": "^2.10.1"
+    "@medusajs/medusa": "^2.10.1",
+    "medusa-payment-authorizenet": "^0.0.1"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",

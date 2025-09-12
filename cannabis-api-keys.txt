@@ -1,0 +1,11 @@
+Straight Gas:
+  Key: pk_42116bf0f1936e5f902b5a14f9ffdacd497bc13bf1ab65b9bbe3a3095358e2d6
+  Sales Channel: sc_01K4XSXT93VTWGQWC6329VYYFP
+
+Liquid Gummies:
+  Key: pk_5230313e5fab407bf9e503711015d0b170249f21597854282c268648b3fd2331
+  Sales Channel: sc_01K4XSXT93VN1C2XWBKB2CK7HN
+
+Liquid Gummies Wholesale:
+  Key: pk_5ea8c0a81c4efb7ee2d75b1be0597ca03a37ffff464c00a992028bde15e320c1
+  Sales Channel: sc_01K4XSXT93DMM6WQ3XDQ62JA4S
