@@ -1,4 +1,4 @@
-import { defineConfig, Modules } from "@medusajs/framework/utils"
+import { defineConfig } from "@medusajs/framework/utils"
 
 export default defineConfig({
   projectConfig: {

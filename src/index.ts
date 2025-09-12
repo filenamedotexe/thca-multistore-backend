@@ -1,7 +1,3 @@
-import { medusaIntegrationTestRunner } from "@medusajs/test-utils"
+import { MedusaApp } from "@medusajs/framework"
 
-export default medusaIntegrationTestRunner({
-  testSuite: () => {
-    console.log("Medusa THCA Backend initialized")
-  }
-})
+export default MedusaApp

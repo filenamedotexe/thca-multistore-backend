@@ -2,9 +2,8 @@
   "name": "thca-backend",
   "version": "1.0.0",
   "description": "Medusa v2 backend for cannabis multi-store e-commerce platform",
-  "main": "dist/index.js",
+  "main": "src/index.ts",
   "scripts": {
-    "build": "medusa build",
     "seed": "medusa exec ./src/scripts/seed.ts",
     "start": "medusa start",
     "dev": "medusa develop",
