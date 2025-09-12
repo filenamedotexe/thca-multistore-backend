@@ -22,6 +22,7 @@
   "dependencies": {
     "@medusajs/framework": "^2.10.1",
     "@medusajs/medusa": "^2.10.1",
+    "dotenv": "^17.2.2",
     "medusa-payment-authorizenet": "^0.0.1",
     "qrcode": "^1.5.4"
   },

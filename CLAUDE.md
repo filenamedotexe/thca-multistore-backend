@@ -91,13 +91,32 @@ const storeConfigs = [
 - **Sample Files**: 3 batches created (BATCH001, BATCH002, BATCH003)
 - **Access**: Direct file serving (no complex APIs)
 
+#### Sample Cannabis Products (2.5.1 Complete)
+- **Product scripts**: Created with ultra-simple 5-field schema
+- **Sales channel integration**: Direct IDs (retail, luxury, wholesale)
+- **COA file integration**: BATCH001-003 COA files + QR codes
+- **Product examples**: Blue Dream, Liquid Gummies, Vape Cartridge
+- **Creation method**: Admin UI ready (http://localhost:9000/app)
+- **Authentication**: admin@thca.com / admin123
+
+#### Cannabis Payment Configuration (2.6.1 Complete)
+- **Environment vars**: Added 8 payment/compliance variables to .env
+- **Authorize.Net**: Cannabis-approved primary processor (configured)
+- **Stripe**: Cannabis-prohibited backup (non-cannabis items only)
+- **Payment routing**: Primary→Authorize.Net, Fallback→Stripe
+- **Compliance flags**: High-risk merchant, logging, age verification
+- **Security**: Placeholder detection, validation script created
+- **Package**: Added dotenv@17.2.2 for environment loading
+
 ### Next Steps
 ✅ **Phase 2.1 COMPLETE**: Sales channels + API keys + environment files  
 ✅ **Phase 2.2.1 COMPLETE**: Cannabis metadata schema defined  
 ✅ **Phase 2.2.2 COMPLETE**: Cannabis product validation functions (ultra-simple)  
 ✅ **Phase 2.3 COMPLETE**: Payment processing configuration (cannabis-compliant)  
 ✅ **Phase 2.4 COMPLETE**: COA file system (ultra-simple, file-based)  
-⏳ **Phase 2.5**: Create sample cannabis products  
+✅ **Phase 2.5.1 COMPLETE**: Sample cannabis products prepared (ultra-simple schema)  
+✅ **Phase 2.6.1 COMPLETE**: Cannabis payment methods configured  
+⏳ **Phase 2.7**: Test backend cannabis configuration  
 - Document all working patterns here
 
 #### API Key Module (Official v2 API)
