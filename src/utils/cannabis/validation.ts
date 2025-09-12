@@ -9,6 +9,9 @@ export interface CannabisMetadata {
   thca_percentage?: string
   delta9_thc?: string
   batch_number?: string
+  coa_file_url?: string
+  coa_last_updated?: string
+  coa_qr_code_url?: string
   [key: string]: string | undefined
 }
 
@@ -76,7 +79,10 @@ export function parseCannabisMetadata(product: any): CannabisMetadata | null {
     cannabis_compliant: product.metadata.cannabis_compliant || 'true', // default compliant
     thca_percentage: product.metadata.thca_percentage || '0',
     delta9_thc: product.metadata.delta9_thc || '0',
-    batch_number: product.metadata.batch_number
+    batch_number: product.metadata.batch_number,
+    coa_file_url: product.metadata.coa_file_url,
+    coa_last_updated: product.metadata.coa_last_updated,
+    coa_qr_code_url: product.metadata.coa_qr_code_url
   }
 }
 

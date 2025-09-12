@@ -83,12 +83,21 @@ const storeConfigs = [
 - **File storage**: Local + Vercel Blob support for lab reports
 - **Compliance**: Cannabis metadata in payment provider configs
 
+#### Ultra-Simple COA System (2.4 Complete)
+- **QR Package**: `qrcode@1.5.4` + `@types/qrcode@1.5.5` installed
+- **COA Files**: `/uploads/coa/[BATCH]-COA.pdf` (direct PDF storage)
+- **QR Codes**: `/uploads/qr-codes/[BATCH]-QR.png` (point to COA PDFs)
+- **Metadata**: Added coa_file_url, coa_last_updated, coa_qr_code_url fields
+- **Sample Files**: 3 batches created (BATCH001, BATCH002, BATCH003)
+- **Access**: Direct file serving (no complex APIs)
+
 ### Next Steps
 ✅ **Phase 2.1 COMPLETE**: Sales channels + API keys + environment files  
 ✅ **Phase 2.2.1 COMPLETE**: Cannabis metadata schema defined  
 ✅ **Phase 2.2.2 COMPLETE**: Cannabis product validation functions (ultra-simple)  
 ✅ **Phase 2.3 COMPLETE**: Payment processing configuration (cannabis-compliant)  
-⏳ **Phase 2.4**: Lab Reports System Setup  
+✅ **Phase 2.4 COMPLETE**: COA file system (ultra-simple, file-based)  
+⏳ **Phase 2.5**: Create sample cannabis products  
 - Document all working patterns here
 
 #### API Key Module (Official v2 API)

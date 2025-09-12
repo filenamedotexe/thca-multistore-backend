@@ -165,6 +165,22 @@ Cannabis-specific data is stored in the standard Medusa `product.metadata` field
    - Lab test dates must be within expiration window
    - Batch numbers must be unique per test date
 
+## COA (Certificate of Analysis) Fields - Ultra-Simple Approach
+```json
+{
+  "coa_file_url": "/uploads/coa/BATCH001-COA.pdf",
+  "coa_last_updated": "2025-09-11", 
+  "coa_qr_code_url": "https://yourdomain.com/uploads/coa/BATCH001-COA.pdf",
+  "batch_number": "BATCH001"
+}
+```
+
+## COA Implementation
+- **File Storage**: Direct PDF upload to `/uploads/coa/` directory
+- **QR Code**: Points directly to COA PDF file URL
+- **Access**: Simple file serving via static URL
+- **Compliance**: File existence = compliance documentation
+
 ## Schema Version
 **Version:** 1.0 (September 2025)
 **Last Updated:** Based on pending Farm Bill proposals and current state regulations
