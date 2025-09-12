@@ -1,3 +1,3 @@
-import { MedusaApp } from "@medusajs/framework"
+import { MedusaAppLoader } from "@medusajs/framework"
 
-export default MedusaApp
+export default MedusaAppLoader
