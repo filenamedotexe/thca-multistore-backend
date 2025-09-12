@@ -6,12 +6,9 @@
 export interface CannabisMetadata {
   cannabis_product?: string
   cannabis_compliant?: string
-  thca_percentage?: string
-  delta9_thc?: string
   batch_number?: string
   coa_file_url?: string
   coa_last_updated?: string
-  coa_qr_code_url?: string
   [key: string]: string | undefined
 }
 
@@ -20,8 +17,7 @@ export interface ValidationResult {
   errors: string[]
   warnings: string[]
   calculated_values: {
-    total_thc: number
-    farm_bill_compliant: boolean
+    cannabis_compliant: boolean
   }
 }
 
@@ -38,7 +34,7 @@ export function validateCannabisMetadata(metadata: CannabisMetadata): Validation
       valid: true,
       errors: [],
       warnings: ['Not marked as cannabis product'],
-      calculated_values: { total_thc: 0, farm_bill_compliant: true }
+      calculated_values: { cannabis_compliant: true }
     }
   }
   
@@ -60,8 +56,7 @@ export function validateCannabisMetadata(metadata: CannabisMetadata): Validation
     errors,
     warnings,
     calculated_values: {
-      total_thc: parseFloat(metadata.thca_percentage || '0'),
-      farm_bill_compliant: isCompliant
+      cannabis_compliant: isCompliant
     }
   }
 }
@@ -77,12 +72,9 @@ export function parseCannabisMetadata(product: any): CannabisMetadata | null {
   return {
     cannabis_product: product.metadata.cannabis_product,
     cannabis_compliant: product.metadata.cannabis_compliant || 'true', // default compliant
-    thca_percentage: product.metadata.thca_percentage || '0',
-    delta9_thc: product.metadata.delta9_thc || '0',
     batch_number: product.metadata.batch_number,
     coa_file_url: product.metadata.coa_file_url,
-    coa_last_updated: product.metadata.coa_last_updated,
-    coa_qr_code_url: product.metadata.coa_qr_code_url
+    coa_last_updated: product.metadata.coa_last_updated
   }
 }
 
@@ -91,10 +83,10 @@ export function parseCannabisMetadata(product: any): CannabisMetadata | null {
  */
 export function formatCannabisDisplay(metadata: CannabisMetadata) {
   return {
-    thc_display: `THCa: ${metadata.thca_percentage || '0'}%`,
     compliance_badge: metadata.cannabis_compliant !== 'false' ? 'Compliant' : 'Non-Compliant',
-    lab_status: 'Compliant by Default',
-    category_display: 'CANNABIS'
+    batch_display: `Batch: ${metadata.batch_number || 'Not specified'}`,
+    coa_status: metadata.coa_file_url ? 'COA Available' : 'COA Pending',
+    last_updated: metadata.coa_last_updated || 'Not specified'
   }
 }
 
