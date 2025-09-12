@@ -1,0 +1,31 @@
+{
+  "name": "thca-backend",
+  "version": "1.0.0",
+  "description": "Medusa v2 backend for cannabis multi-store e-commerce platform",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "medusa build",
+    "seed": "medusa exec ./src/scripts/seed.ts",
+    "start": "medusa start",
+    "dev": "medusa develop",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cannabis",
+    "medusa",
+    "ecommerce",
+    "thca"
+  ],
+  "author": "Cole Boban",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@medusajs/framework": "^2.10.1",
+    "@medusajs/medusa": "^2.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
