@@ -14,7 +14,7 @@ module.exports = defineConfig({
   },
   admin: {
     disable: false,
-    path: "/admin",
+    path: "/app",
   },
   modules: [
     {
