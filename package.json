@@ -21,9 +21,17 @@
   "dependencies": {
     "@medusajs/framework": "^2.10.1",
     "@medusajs/medusa": "^2.10.1",
+    "@radix-ui/react-select": "^2.2.6",
+    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "dotenv": "^17.2.2",
+    "lucide-react": "^0.544.0",
     "medusa-payment-authorizenet": "^0.0.1",
-    "qrcode": "^1.5.4"
+    "qrcode": "^1.5.4",
+    "recharts": "^3.2.0",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@types/node": "^24.3.1",
