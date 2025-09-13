@@ -19,24 +19,29 @@ const CannabisDashboardWidget = () => {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch cannabis business metrics from your API
+    // Fetch real cannabis business metrics from database
     const fetchCannabisMetrics = async () => {
       try {
-        // 🚧 Custom Implementation: Cannabis metrics API endpoint
-        // This would connect to your cannabis business logic
-        const response = await fetch('/admin/cannabis/metrics')
+        console.log('Fetching real cannabis metrics from database...')
+
+        // ✅ Fetch Real Metrics from Database API
+        const response = await fetch('/admin/cannabis/metrics', {
+          credentials: 'include'
+        })
+
         const data = await response.json()
+        console.log('Real cannabis metrics from database:', data)
         setMetrics(data)
       } catch (error) {
-        console.error('Failed to fetch cannabis metrics:', error)
-        // Fallback data for demo
+        console.error('Failed to fetch cannabis metrics from database:', error)
+        // Set minimal loading state for error case
         setMetrics({
-          totalRevenue: 125000,
-          totalOrders: 450,
-          complianceStatus: 'compliant',
-          ageVerificationRate: 99.2,
-          coaFilesActive: 15,
-          lastComplianceCheck: new Date().toISOString().split('T')[0]
+          totalRevenue: 0,
+          totalOrders: 0,
+          complianceStatus: 'warning',
+          ageVerificationRate: 0,
+          coaFilesActive: 0,
+          lastComplianceCheck: 'Unable to connect to database'
         })
       } finally {
         setLoading(false)
@@ -77,14 +82,13 @@ const CannabisDashboardWidget = () => {
 
   return (
     <Container className="divide-y p-0">
-      {/* Header */}
       <div className="flex items-center justify-between px-6 py-4">
-        <Heading level="h2">Cannabis Business Overview</Heading>
+        <Heading level="h2">🌿 Cannabis Business Overview</Heading>
         <div className={`font-semibold ${getComplianceColor()}`}>
           {getComplianceIcon()} {metrics.complianceStatus.toUpperCase()}
         </div>
       </div>
-      
+
       <div className="px-6 py-4">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {/* Revenue Metric */}
@@ -95,7 +99,7 @@ const CannabisDashboardWidget = () => {
             <div className="text-sm text-gray-600">Total Revenue</div>
             <div className="text-xs text-gray-500">Cannabis sales</div>
           </div>
-          
+
           {/* Orders Metric */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-blue-600">
@@ -104,7 +108,7 @@ const CannabisDashboardWidget = () => {
             <div className="text-sm text-gray-600">Total Orders</div>
             <div className="text-xs text-gray-500">Completed orders</div>
           </div>
-          
+
           {/* Age Verification Rate */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-purple-600">
@@ -113,7 +117,7 @@ const CannabisDashboardWidget = () => {
             <div className="text-sm text-gray-600">Age Verification</div>
             <div className="text-xs text-gray-500">Success rate</div>
           </div>
-          
+
           {/* COA Files Active */}
           <div className="bg-gray-50 p-4 rounded-lg">
             <div className="text-2xl font-bold text-orange-600">
@@ -132,7 +136,7 @@ const CannabisDashboardWidget = () => {
               {getComplianceIcon()}
             </div>
           </div>
-          
+
           <div className="mt-2 text-sm text-green-700">
             ✅ Age verification active • ✅ COA files accessible • ✅ License valid • ✅ Payment compliant
           </div>
