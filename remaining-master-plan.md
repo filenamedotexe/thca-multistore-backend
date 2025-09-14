@@ -2,58 +2,1978 @@
 
 ## 🎯 Low Complexity, High Value Implementation Guide
 
-**Current Status:** Phases 1-3.4 Complete ✅  
-**Remaining Work:** 7 Value-Driven Phases (16.5 Hours Total)  
+**Current Status:** Phases 1-3.7.3 Complete ✅
+**Remaining Work:** 5 Value-Driven Phases (8.5 Hours Total)
 **Philosophy:** Working cannabis business with modern professional features, zero enterprise bloat
 
 ---
 
 ## PHASE OVERVIEW
 
-### ✅ COMPLETED (Phases 1-3.4):
-- ✅ 4 separate GitHub repositories created
-- ✅ Medusa v2 backend configured for cannabis operations  
+### ✅ COMPLETED (Phases 1-3.7.3):
+- ✅ 4 separate GitHub repositories created and deployed
+- ✅ Medusa v2 backend with cannabis operations (real database integration)
 - ✅ 3 sales channels with API keys (retail, luxury, wholesale)
-- ✅ Cannabis metadata schema & validation (ultra-simple)
+- ✅ Cannabis metadata schema & validation (ultra-simple approach)
 - ✅ Shared cannabis utilities (age gates, COA pages, product info)
 - ✅ Cannabis compliance components installed in all 3 stores
-- ✅ Store-specific styling (retail, luxury, wholesale)
-- ✅ QR code support and COA file system
+- ✅ Store-specific styling (retail, luxury, wholesale branding)
+- ✅ QR code support and COA file system (3 sample files)
+- ✅ **Modern Dashboard & CRM Foundation** (Phase 3.6 - real database integration)
+- ✅ **Cannabis Admin System** (Phase 3.7.1-3.7.3):
+  - ✅ Master admin configuration page (cannabis-config)
+  - ✅ User role management system (cannabis-users)
+  - ✅ Cannabis dashboard widget (real metrics)
+  - ✅ 4 working API endpoints with database persistence
+  - ✅ Cannabis role system (4 roles with permissions in database)
 
-### 🎯 REMAINING (Phases 3.5-5):
-- 🔍 **Phase 3.5:** Cannabis Compliance Testing (30 minutes)
-- 📊 **Phase 3.6:** Modern Dashboard & CRM Foundation (2 hours)
-- ⚙️ **Phase 3.7:** Master Admin Settings & User Roles (2.5 hours)
+### 🎯 REMAINING (Phases 3.7.4-5):
+- 📊 **Phase 3.7.4:** Cannabis Orders Management Page (1 hour)
+- 👥 **Phase 3.7.5:** Cannabis Customers Management Page (1 hour)
+- 📦 **Phase 3.7.6:** Cannabis Products Management Page (1.5 hours)
 - 📧 **Phase 3.8:** Email & Reporting Integration (2 hours)
 - 🎨 **Phase 3.9:** Advanced UI Components & Polish (1.5 hours)
-- 💳 **Phase 4:** Essential Testing & Basic Payments (3 hours)  
-- 🚀 **Phase 5:** Production Deployment (5 hours)
+- 💳 **Phase 4:** Essential Testing & Basic Payments (1.5 hours)
 
-**Total Remaining:** 16.5 hours to professional cannabis business platform
+**Total Remaining:** 8.5 hours to complete professional cannabis business platform
 
 ---
 
-# Phase 3.5: Cannabis Compliance Testing (30 minutes)
+# Phase 3.7.4: Cannabis Orders Management Page (1 hour)
 
 ## Overview
-Verify that all cannabis compliance components are working correctly across all three stores. This is essential validation before payments and deployment.
+Create a dedicated cannabis orders management page in the Medusa admin that provides role-based access to order operations. This page will use real Medusa v2 ORDER service APIs and implement cannabis-specific order workflows with proper compliance tracking.
+
+**✅ Based on Official Documentation:**
+- **Medusa v2 UI Routes:** Official admin page structure using defineRouteConfig
+- **ORDER Module:** Official Medusa v2 service for order management
+- **@medusajs/ui Components:** Official UI components for consistent design
+- **Cannabis Role System:** Uses existing cannabis user metadata for permissions
 
 ## Prerequisites
-- All stores must have cannabis components installed (completed in Phase 3.4)
-- Backend must be configured and running
-- Shared cannabis utilities must exist
+- Cannabis admin system completed (Phase 3.7.1-3.7.3)
+- Cannabis role system with permissions in database
+- Real Medusa v2 ORDER service available
 
 ---
 
-## Step 3.5.1: Create Comprehensive Cannabis Compliance Test
+## Step 3.7.4: Create Cannabis Orders Management Page
 
-### Create the Master Test Script
+### Create Orders Management Page with Role-Based Access
 
 ```bash
-# Navigate to the main repository directory
-cd /Users/zachwieder/Documents/🗂️\ AGENCY/Cole\ Boban/thca-multistore-repos
+cd /Users/zachwieder/Documents/🗂️\ AGENCY/Cole\ Boban/thca-multistore-repos/thca-multistore-backend
 
-# Create comprehensive cannabis compliance verification script
+# Create orders management admin page
+mkdir -p src/admin/routes/cannabis-orders
+
+cat > src/admin/routes/cannabis-orders/page.tsx << 'EOF'
+// Cannabis Orders Management - Official Medusa v2 UI Route Pattern
+// Uses real ORDER service with cannabis role-based permissions
+// Reference: https://docs.medusajs.com/learn/customization/customize-admin
+
+import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { Container, Heading, Button, Input, Select, Badge, Text, Label } from "@medusajs/ui"
+import React, { useState, useEffect } from "react"
+
+// Real Medusa v2 Order Interface (matches database schema)
+interface MedusaOrder {
+  id: string
+  display_id: number
+  status: string
+  total: number
+  currency_code: string
+  customer_id: string
+  email: string
+  created_at: string
+  updated_at: string
+  payment_status: string
+  fulfillment_status: string
+  customer?: {
+    id: string
+    email: string
+    first_name?: string
+    last_name?: string
+  }
+  items?: Array<{
+    id: string
+    title: string
+    quantity: number
+    unit_price: number
+    total: number
+    metadata?: {
+      cannabis_compliant?: string
+      batch_number?: string
+      coa_file?: string
+    }
+  }>
+  metadata?: {
+    cannabis_compliant?: string
+    age_verification_confirmed?: string
+    compliance_checked?: string
+    store_type?: string
+  }
+}
+
+interface CannabisOrdersPageProps {}
+
+const CannabisOrdersPage = () => {
+  const [orders, setOrders] = useState<MedusaOrder[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [selectedOrder, setSelectedOrder] = useState<MedusaOrder | null>(null)
+
+  // Fetch current user to check permissions
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        // Get current admin user session to check cannabis permissions
+        const userResponse = await fetch('/admin/auth/session', {
+          credentials: 'include'
+        })
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          setCurrentUser(userData.user)
+        }
+      } catch (error) {
+        console.error('Failed to get current user:', error)
+      }
+    }
+
+    fetchCurrentUser()
+  }, [])
+
+  // Fetch real orders from Medusa v2 database
+  useEffect(() => {
+    const fetchRealOrders = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // ✅ Fetch real orders from Medusa v2 ORDER service
+        const response = await fetch('/admin/orders', {
+          credentials: 'include'
+        })
+
+        if (!response.ok) {
+          throw new Error(\`Orders API failed: \${response.status}\`)
+        }
+
+        const ordersData = await response.json()
+        console.log('Real orders from database:', ordersData)
+
+        setOrders(ordersData.orders || [])
+        console.log(\`✅ Loaded \${ordersData.orders?.length || 0} orders from database\`)
+
+      } catch (error) {
+        console.error('Failed to fetch orders from database:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load orders')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRealOrders()
+  }, [])
+
+  // Check if current user has permission to manage orders
+  const canManageOrders = currentUser?.metadata?.can_process_orders !== false
+
+  // Filter orders based on search and status
+  const filteredOrders = orders.filter(order => {
+    const matchesSearch =
+      order.display_id.toString().includes(searchTerm) ||
+      order.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      order.customer?.last_name?.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const matchesStatus = statusFilter === 'all' || order.status === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
+  // Update order status with real database persistence
+  const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
+    if (!canManageOrders) {
+      alert('❌ Insufficient permissions to update orders')
+      return
+    }
+
+    try {
+      console.log(\`Updating order \${orderId} status to \${newStatus} in database\`)
+
+      // ✅ Update order status using Medusa v2 ORDER service
+      const response = await fetch(\`/admin/orders/\${orderId}\`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          metadata: {
+            ...orders.find(o => o.id === orderId)?.metadata,
+            updated_by: 'cannabis_admin',
+            updated_at: new Date().toISOString()
+          }
+        }),
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        // Update local state after successful database update
+        setOrders(orders.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        ))
+        alert(\`✅ Order #\${orders.find(o => o.id === orderId)?.display_id} status updated to \${newStatus}\`)
+        console.log('✅ Order status updated in database')
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update order status:', errorData)
+        alert(\`❌ Failed to update order: \${errorData.message || 'Database error'}\`)
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error)
+      alert('❌ Failed to update order - database connection error')
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Badge color="orange">⏳ Pending</Badge>
+      case 'completed':
+        return <Badge color="green">✅ Completed</Badge>
+      case 'cancelled':
+        return <Badge color="red">❌ Cancelled</Badge>
+      case 'requires_action':
+        return <Badge color="yellow">⚠️ Action Required</Badge>
+      default:
+        return <Badge color="grey">{status}</Badge>
+    }
+  }
+
+  const getComplianceBadge = (order: MedusaOrder) => {
+    const isCompliant = order.metadata?.cannabis_compliant === 'true'
+    const ageVerified = order.metadata?.age_verification_confirmed === 'true'
+
+    if (isCompliant && ageVerified) {
+      return <Badge color="green">🌿 Cannabis Compliant</Badge>
+    } else if (!ageVerified) {
+      return <Badge color="red">❌ Age Verification Required</Badge>
+    } else {
+      return <Badge color="yellow">⚠️ Compliance Check Needed</Badge>
+    }
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Cannabis Orders - Error</Heading>
+          <Badge color="red">❌ Database Error</Badge>
+        </div>
+        <div className="px-6 py-6">
+          <div className="text-red-600">
+            Failed to load orders: {error}
+          </div>
+          <div className="text-sm text-gray-600 mt-2">
+            Please check backend connection and authentication.
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Loading Cannabis Orders...</Heading>
+        </div>
+        <div className="px-6 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  return (
+    <Container className="divide-y p-0">
+      <div className="flex items-center justify-between px-6 py-4">
+        <Heading level="h1">🛒 Cannabis Orders Management</Heading>
+        <div className="flex items-center gap-2">
+          <Badge color="green">✅ Real Database</Badge>
+          <Text size="small">({orders.length} orders)</Text>
+        </div>
+      </div>
+
+      <div className="px-6 py-6">
+        {/* Search and Filter Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label>Search Orders</Label>
+              <Input
+                placeholder="Search by order #, email, or customer name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-48">
+              <Label>Status Filter</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <option value="all">All Orders</option>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
+                <option value="requires_action">Requires Action</option>
+              </Select>
+            </div>
+          </div>
+
+          {!canManageOrders && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <Text size="small" className="text-yellow-800">
+                ⚠️ You have read-only access to orders. Contact an admin to modify orders.
+              </Text>
+            </div>
+          )}
+        </div>
+
+        {/* Orders List */}
+        {filteredOrders.length > 0 ? (
+          <div className="space-y-4">
+            {filteredOrders.map((order) => (
+              <div key={order.id} className="border rounded-lg p-6">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 space-y-3">
+                    {/* Order Header */}
+                    <div className="flex items-center gap-3">
+                      <Heading level="h3">Order #{order.display_id}</Heading>
+                      {getStatusBadge(order.status)}
+                      {getComplianceBadge(order)}
+                    </div>
+
+                    {/* Order Details Grid */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                      <div>
+                        <Text size="small" weight="plus">Customer</Text>
+                        <Text size="small">
+                          {order.customer?.first_name} {order.customer?.last_name}
+                        </Text>
+                        <Text size="small" className="text-gray-600">{order.email}</Text>
+                      </div>
+                      <div>
+                        <Text size="small" weight="plus">Total</Text>
+                        <Text size="small">
+                          \${(order.total / 100).toFixed(2)} {order.currency_code?.toUpperCase()}
+                        </Text>
+                      </div>
+                      <div>
+                        <Text size="small" weight="plus">Date</Text>
+                        <Text size="small">
+                          {new Date(order.created_at).toLocaleDateString()}
+                        </Text>
+                      </div>
+                      <div>
+                        <Text size="small" weight="plus">Payment</Text>
+                        <Badge color={order.payment_status === 'captured' ? 'green' : 'orange'}>
+                          {order.payment_status}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    {/* Order Items */}
+                    {order.items && order.items.length > 0 && (
+                      <div>
+                        <Text size="small" weight="plus">Items ({order.items.length})</Text>
+                        <div className="mt-2 space-y-2">
+                          {order.items.slice(0, 3).map((item) => (
+                            <div key={item.id} className="flex justify-between p-2 bg-gray-50 rounded">
+                              <div>
+                                <Text size="small">{item.title}</Text>
+                                <Text size="small" className="text-gray-600">
+                                  Qty: {item.quantity} × \${(item.unit_price / 100).toFixed(2)}
+                                </Text>
+                                {item.metadata?.batch_number && (
+                                  <Text size="small" className="text-green-600">
+                                    🌿 Batch: {item.metadata.batch_number}
+                                  </Text>
+                                )}
+                              </div>
+                              <Text size="small" weight="plus">
+                                \${(item.total / 100).toFixed(2)}
+                              </Text>
+                            </div>
+                          ))}
+                          {order.items.length > 3 && (
+                            <Text size="small" className="text-gray-600">
+                              +{order.items.length - 3} more items...
+                            </Text>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Order Actions */}
+                  <div className="flex flex-col gap-2 ml-4">
+                    {canManageOrders ? (
+                      <>
+                        <Select
+                          value={order.status}
+                          onValueChange={(newStatus) => handleUpdateOrderStatus(order.id, newStatus)}
+                        >
+                          <option value="pending">Pending</option>
+                          <option value="completed">Completed</option>
+                          <option value="cancelled">Cancelled</option>
+                          <option value="requires_action">Requires Action</option>
+                        </Select>
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => setSelectedOrder(order)}
+                        >
+                          View Details
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => setSelectedOrder(order)}
+                      >
+                        View Details
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-lg font-medium">
+              {orders.length === 0 ? 'No orders in database' : 'No orders match your search'}
+            </div>
+            <Text size="small">
+              {orders.length === 0
+                ? 'Orders will appear here as customers place them'
+                : 'Try adjusting your search or filter criteria'
+              }
+            </Text>
+            <div className="mt-2">
+              <Badge color="green">✅ Connected to Medusa v2 ORDER service</Badge>
+            </div>
+          </div>
+        )}
+
+        {/* Order Details Modal */}
+        {selectedOrder && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Container className="max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b">
+                <div className="flex items-center justify-between">
+                  <Heading level="h2">Order #{selectedOrder.display_id} Details</Heading>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => setSelectedOrder(null)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+
+              <div className="px-6 py-6 space-y-6">
+                {/* Order Status and Compliance */}
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="text-center p-4 border rounded">
+                    <Text size="small" weight="plus">Order Status</Text>
+                    <div className="mt-2">{getStatusBadge(selectedOrder.status)}</div>
+                  </div>
+                  <div className="text-center p-4 border rounded">
+                    <Text size="small" weight="plus">Cannabis Compliance</Text>
+                    <div className="mt-2">{getComplianceBadge(selectedOrder)}</div>
+                  </div>
+                  <div className="text-center p-4 border rounded">
+                    <Text size="small" weight="plus">Payment Status</Text>
+                    <div className="mt-2">
+                      <Badge color={selectedOrder.payment_status === 'captured' ? 'green' : 'orange'}>
+                        {selectedOrder.payment_status}
+                      </Badge>
+                    </div>
+                  </div>
+                  <div className="text-center p-4 border rounded">
+                    <Text size="small" weight="plus">Total Value</Text>
+                    <div className="mt-2 font-bold">
+                      \${(selectedOrder.total / 100).toFixed(2)}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Information */}
+                <div className="border rounded-lg p-4">
+                  <Text weight="plus">Customer Information</Text>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    <div>
+                      <Text size="small">Name: {selectedOrder.customer?.first_name} {selectedOrder.customer?.last_name}</Text>
+                      <Text size="small">Email: {selectedOrder.email}</Text>
+                      <Text size="small">Customer ID: {selectedOrder.customer_id}</Text>
+                    </div>
+                    <div>
+                      <Text size="small">Order Date: {new Date(selectedOrder.created_at).toLocaleString()}</Text>
+                      <Text size="small">Last Updated: {new Date(selectedOrder.updated_at).toLocaleString()}</Text>
+                      {selectedOrder.metadata?.store_type && (
+                        <Text size="small">Store Type: {selectedOrder.metadata.store_type}</Text>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Items Detail */}
+                {selectedOrder.items && selectedOrder.items.length > 0 && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Order Items ({selectedOrder.items.length})</Text>
+                    <div className="mt-3 space-y-3">
+                      {selectedOrder.items.map((item) => (
+                        <div key={item.id} className="flex justify-between items-start p-3 bg-gray-50 rounded">
+                          <div className="flex-1">
+                            <Text size="small" weight="plus">{item.title}</Text>
+                            <Text size="small">Quantity: {item.quantity}</Text>
+                            <Text size="small">Unit Price: \${(item.unit_price / 100).toFixed(2)}</Text>
+                            {item.metadata?.batch_number && (
+                              <div className="mt-1">
+                                <Badge color="green">🌿 Batch: {item.metadata.batch_number}</Badge>
+                              </div>
+                            )}
+                            {item.metadata?.coa_file && (
+                              <div className="mt-1">
+                                <Badge color="blue">📋 COA Available</Badge>
+                              </div>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <Text size="small" weight="plus">\${(item.total / 100).toFixed(2)}</Text>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Order Actions */}
+                {canManageOrders && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Order Management Actions</Text>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="primary"
+                        size="small"
+                        onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'completed')}
+                        disabled={selectedOrder.status === 'completed'}
+                      >
+                        Mark Complete
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'requires_action')}
+                        disabled={selectedOrder.status === 'requires_action'}
+                      >
+                        Flag for Review
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="small"
+                        onClick={() => handleUpdateOrderStatus(selectedOrder.id, 'cancelled')}
+                        disabled={selectedOrder.status === 'cancelled'}
+                      >
+                        Cancel Order
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Container>
+          </div>
+        )}
+      </div>
+    </Container>
+  )
+}
+
+// ✅ Official Medusa v2 Route Configuration
+export const config = defineRouteConfig({
+  label: "🛒 Cannabis Orders",
+})
+
+export default CannabisOrdersPage
+
+EOF
+
+echo "✅ Cannabis orders management page created with real database integration"
+```
+
+---
+
+# Phase 3.7.5: Cannabis Customers Management Page (1 hour)
+
+## Overview
+Create a dedicated cannabis customers management page in the Medusa admin that provides role-based access to customer operations. This page will use real Medusa v2 CUSTOMER service APIs and implement cannabis-specific customer workflows with proper compliance tracking.
+
+**✅ Based on Official Documentation:**
+- **Medusa v2 UI Routes:** Official admin page structure using defineRouteConfig
+- **CUSTOMER Module:** Official Medusa v2 service for customer management
+- **@medusajs/ui Components:** Official UI components for consistent design
+- **Cannabis Role System:** Uses existing cannabis user metadata for permissions
+
+## Prerequisites
+- Cannabis admin system completed (Phase 3.7.1-3.7.4)
+- Cannabis role system with permissions in database
+- Real Medusa v2 CUSTOMER service available
+
+---
+
+## Step 3.7.5: Create Cannabis Customers Management Page
+
+### Create Customers Management Page with Role-Based Access
+
+```bash
+cd /Users/zachwieder/Documents/🗂️\ AGENCY/Cole\ Boban/thca-multistore-repos/thca-multistore-backend
+
+# Create customers management admin page
+mkdir -p src/admin/routes/cannabis-customers
+
+cat > src/admin/routes/cannabis-customers/page.tsx << 'EOF'
+// Cannabis Customers Management - Official Medusa v2 UI Route Pattern
+// Uses real CUSTOMER service with cannabis role-based permissions
+// Reference: https://docs.medusajs.com/learn/customization/customize-admin
+
+import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { Container, Heading, Button, Input, Select, Badge, Text, Label, Textarea } from "@medusajs/ui"
+import React, { useState, useEffect } from "react"
+
+// Real Medusa v2 Customer Interface (matches database schema)
+interface MedusaCustomer {
+  id: string
+  email: string
+  first_name?: string
+  last_name?: string
+  phone?: string
+  created_at: string
+  updated_at: string
+  deleted_at?: string
+  has_account: boolean
+  metadata?: {
+    age_verified?: string
+    cannabis_compliant?: string
+    notes?: string
+    status?: 'active' | 'inactive' | 'flagged'
+    last_order_date?: string
+    total_spent?: string
+    total_orders?: string
+    verification_date?: string
+    compliance_check_date?: string
+  }
+}
+
+const CannabisCustomersPage = () => {
+  const [customers, setCustomers] = useState<MedusaCustomer[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [selectedCustomer, setSelectedCustomer] = useState<MedusaCustomer | null>(null)
+  const [newNote, setNewNote] = useState('')
+
+  // Fetch current user to check permissions
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        // Get current admin user session to check cannabis permissions
+        const userResponse = await fetch('/admin/auth/session', {
+          credentials: 'include'
+        })
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          setCurrentUser(userData.user)
+        }
+      } catch (error) {
+        console.error('Failed to get current user:', error)
+      }
+    }
+
+    fetchCurrentUser()
+  }, [])
+
+  // Fetch real customers from Medusa v2 database
+  useEffect(() => {
+    const fetchRealCustomers = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // ✅ Fetch real customers from Medusa v2 CUSTOMER service
+        const response = await fetch('/admin/customers', {
+          credentials: 'include'
+        })
+
+        if (!response.ok) {
+          throw new Error(\`Customers API failed: \${response.status}\`)
+        }
+
+        const customersData = await response.json()
+        console.log('Real customers from database:', customersData)
+
+        setCustomers(customersData.customers || [])
+        console.log(\`✅ Loaded \${customersData.customers?.length || 0} customers from database\`)
+
+      } catch (error) {
+        console.error('Failed to fetch customers from database:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load customers')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRealCustomers()
+  }, [])
+
+  // Check if current user has permission to manage customers
+  const canManageCustomers = currentUser?.metadata?.can_view_reports !== false
+
+  // Filter customers based on search and status
+  const filteredCustomers = customers.filter(customer => {
+    const fullName = \`\${customer.first_name || ''} \${customer.last_name || ''}\`.trim()
+    const matchesSearch =
+      fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      customer.email.toLowerCase().includes(searchTerm.toLowerCase())
+
+    const customerStatus = customer.metadata?.status || 'active'
+    const matchesStatus = statusFilter === 'all' || customerStatus === statusFilter
+
+    return matchesSearch && matchesStatus
+  })
+
+  // Update customer metadata with real database persistence
+  const handleUpdateCustomer = async (customerId: string, updates: any) => {
+    try {
+      console.log(\`Updating customer \${customerId} in database\`, updates)
+
+      // ✅ Update customer using Medusa v2 CUSTOMER service
+      const response = await fetch(\`/admin/customers/\${customerId}\`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          metadata: {
+            ...customers.find(c => c.id === customerId)?.metadata,
+            ...updates,
+            updated_at: new Date().toISOString()
+          }
+        }),
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        // Update local state after successful database update
+        setCustomers(customers.map(customer =>
+          customer.id === customerId
+            ? {
+                ...customer,
+                metadata: { ...customer.metadata, ...updates }
+              }
+            : customer
+        ))
+        console.log('✅ Customer updated in database')
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update customer:', errorData)
+        alert(\`❌ Failed to update customer: \${errorData.message || 'Database error'}\`)
+        return false
+      }
+    } catch (error) {
+      console.error('Error updating customer:', error)
+      alert('❌ Failed to update customer - database connection error')
+      return false
+    }
+  }
+
+  const handleAddNote = async () => {
+    if (!selectedCustomer || !newNote.trim()) return
+
+    const success = await handleUpdateCustomer(selectedCustomer.id, {
+      notes: newNote.trim()
+    })
+
+    if (success) {
+      setNewNote('')
+      alert('✅ Customer note saved to database')
+    }
+  }
+
+  const handleStatusChange = async (customerId: string, newStatus: string) => {
+    const success = await handleUpdateCustomer(customerId, {
+      status: newStatus
+    })
+
+    if (success) {
+      const customer = customers.find(c => c.id === customerId)
+      const name = \`\${customer?.first_name || ''} \${customer?.last_name || ''}\`.trim()
+      alert(\`✅ \${name || 'Customer'} status updated to \${newStatus}\`)
+    }
+  }
+
+  const getStatusBadge = (customer: MedusaCustomer) => {
+    const status = customer.metadata?.status || 'active'
+    switch (status) {
+      case 'active':
+        return <Badge color="green">✅ Active</Badge>
+      case 'inactive':
+        return <Badge color="grey">⏸️ Inactive</Badge>
+      case 'flagged':
+        return <Badge color="red">🚩 Flagged</Badge>
+      default:
+        return <Badge color="grey">{status}</Badge>
+    }
+  }
+
+  const getComplianceBadge = (customer: MedusaCustomer) => {
+    const ageVerified = customer.metadata?.age_verified === 'true'
+    const cannabisCompliant = customer.metadata?.cannabis_compliant === 'true'
+
+    if (ageVerified && cannabisCompliant) {
+      return <Badge color="green">🌿 Fully Compliant</Badge>
+    } else if (ageVerified) {
+      return <Badge color="yellow">⚠️ Cannabis Review Needed</Badge>
+    } else {
+      return <Badge color="red">❌ Age Verification Required</Badge>
+    }
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Cannabis Customers - Error</Heading>
+          <Badge color="red">❌ Database Error</Badge>
+        </div>
+        <div className="px-6 py-6">
+          <div className="text-red-600">
+            Failed to load customers: {error}
+          </div>
+          <div className="text-sm text-gray-600 mt-2">
+            Please check backend connection and authentication.
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Loading Cannabis Customers...</Heading>
+        </div>
+        <div className="px-6 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  return (
+    <Container className="divide-y p-0">
+      <div className="flex items-center justify-between px-6 py-4">
+        <Heading level="h1">👥 Cannabis Customers Management</Heading>
+        <div className="flex items-center gap-2">
+          <Badge color="green">✅ Real Database</Badge>
+          <Text size="small">({customers.length} customers)</Text>
+        </div>
+      </div>
+
+      <div className="px-6 py-6">
+        {/* Search and Filter Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label>Search Customers</Label>
+              <Input
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-48">
+              <Label>Status Filter</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <option value="all">All Customers</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+                <option value="flagged">Flagged</option>
+              </Select>
+            </div>
+          </div>
+
+          {!canManageCustomers && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <Text size="small" className="text-yellow-800">
+                ⚠️ You have limited access to customer data. Contact an admin for full access.
+              </Text>
+            </div>
+          )}
+        </div>
+
+        {/* Customers List */}
+        {filteredCustomers.length > 0 ? (
+          <div className="space-y-4">
+            {filteredCustomers.map((customer) => {
+              const fullName = \`\${customer.first_name || ''} \${customer.last_name || ''}\`.trim()
+              const totalSpent = parseFloat(customer.metadata?.total_spent || '0')
+              const totalOrders = parseInt(customer.metadata?.total_orders || '0')
+
+              return (
+                <div key={customer.id} className="border rounded-lg p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-3">
+                      {/* Customer Header */}
+                      <div className="flex items-center gap-3">
+                        <Heading level="h3">{fullName || 'Anonymous Customer'}</Heading>
+                        {getStatusBadge(customer)}
+                        {getComplianceBadge(customer)}
+                      </div>
+
+                      {/* Customer Details Grid */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                          <Text size="small" weight="plus">Email</Text>
+                          <Text size="small">{customer.email}</Text>
+                          {customer.phone && (
+                            <Text size="small" className="text-gray-600">{customer.phone}</Text>
+                          )}
+                        </div>
+                        <div>
+                          <Text size="small" weight="plus">Orders</Text>
+                          <Text size="small">{totalOrders} orders</Text>
+                          <Text size="small" className="text-gray-600">
+                            \${totalSpent.toFixed(2)} total
+                          </Text>
+                        </div>
+                        <div>
+                          <Text size="small" weight="plus">Registration</Text>
+                          <Text size="small">
+                            {new Date(customer.created_at).toLocaleDateString()}
+                          </Text>
+                          {customer.has_account && (
+                            <Badge color="blue">👤 Has Account</Badge>
+                          )}
+                        </div>
+                        <div>
+                          <Text size="small" weight="plus">Verification</Text>
+                          {customer.metadata?.age_verified === 'true' ? (
+                            <Badge color="green">✅ Age Verified</Badge>
+                          ) : (
+                            <Badge color="red">❌ Pending</Badge>
+                          )}
+                          {customer.metadata?.verification_date && (
+                            <Text size="small" className="text-gray-600">
+                              {new Date(customer.metadata.verification_date).toLocaleDateString()}
+                            </Text>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Customer Notes */}
+                      {customer.metadata?.notes && (
+                        <div className="p-3 bg-blue-50 rounded">
+                          <Text size="small" weight="plus">Notes:</Text>
+                          <Text size="small">{customer.metadata.notes}</Text>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Customer Actions */}
+                    <div className="flex flex-col gap-2 ml-4">
+                      {canManageCustomers ? (
+                        <>
+                          <Select
+                            value={customer.metadata?.status || 'active'}
+                            onValueChange={(newStatus) => handleStatusChange(customer.id, newStatus)}
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="flagged">Flagged</option>
+                          </Select>
+                          <Button
+                            variant="secondary"
+                            size="small"
+                            onClick={() => setSelectedCustomer(customer)}
+                          >
+                            Edit Details
+                          </Button>
+                          <Button
+                            variant="transparent"
+                            size="small"
+                            onClick={() => {
+                              if (customer.metadata?.age_verified !== 'true') {
+                                handleUpdateCustomer(customer.id, {
+                                  age_verified: 'true',
+                                  verification_date: new Date().toISOString()
+                                })
+                              }
+                            }}
+                            disabled={customer.metadata?.age_verified === 'true'}
+                          >
+                            {customer.metadata?.age_verified === 'true' ? '✅ Verified' : 'Verify Age'}
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => setSelectedCustomer(customer)}
+                        >
+                          View Details
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-lg font-medium">
+              {customers.length === 0 ? 'No customers in database' : 'No customers match your search'}
+            </div>
+            <Text size="small">
+              {customers.length === 0
+                ? 'Customers will appear here as they register'
+                : 'Try adjusting your search or filter criteria'
+              }
+            </Text>
+            <div className="mt-2">
+              <Badge color="green">✅ Connected to Medusa v2 CUSTOMER service</Badge>
+            </div>
+          </div>
+        )}
+
+        {/* Customer Details Modal */}
+        {selectedCustomer && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Container className="max-w-3xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b">
+                <div className="flex items-center justify-between">
+                  <Heading level="h2">
+                    Customer: {\`\${selectedCustomer.first_name || ''} \${selectedCustomer.last_name || ''}\`.trim() || 'Anonymous'}
+                  </Heading>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => setSelectedCustomer(null)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+
+              <div className="px-6 py-6 space-y-6">
+                {/* Customer Information */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Text weight="plus">Contact Information</Text>
+                    <div className="mt-2 space-y-1">
+                      <Text size="small">Database ID: {selectedCustomer.id}</Text>
+                      <Text size="small">Email: {selectedCustomer.email}</Text>
+                      {selectedCustomer.phone && (
+                        <Text size="small">Phone: {selectedCustomer.phone}</Text>
+                      )}
+                      <Text size="small">
+                        Account: {selectedCustomer.has_account ? 'Yes' : 'No'}
+                      </Text>
+                    </div>
+                  </div>
+                  <div>
+                    <Text weight="plus">Registration Details</Text>
+                    <div className="mt-2 space-y-1">
+                      <Text size="small">
+                        Registered: {new Date(selectedCustomer.created_at).toLocaleDateString()}
+                      </Text>
+                      <Text size="small">
+                        Last Updated: {new Date(selectedCustomer.updated_at).toLocaleDateString()}
+                      </Text>
+                      <Text size="small">
+                        Total Orders: {selectedCustomer.metadata?.total_orders || '0'}
+                      </Text>
+                      <Text size="small">
+                        Total Spent: \${parseFloat(selectedCustomer.metadata?.total_spent || '0').toFixed(2)}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cannabis Compliance Status */}
+                <div className="border rounded-lg p-4">
+                  <Text weight="plus">Cannabis Compliance Status</Text>
+                  <div className="mt-3 grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Text size="small">Age Verification (21+)</Text>
+                        {selectedCustomer.metadata?.age_verified === 'true' ? (
+                          <Badge color="green">✅ Verified</Badge>
+                        ) : (
+                          <Badge color="red">❌ Required</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Text size="small">Cannabis Compliance</Text>
+                        {selectedCustomer.metadata?.cannabis_compliant === 'true' ? (
+                          <Badge color="green">🌿 Compliant</Badge>
+                        ) : (
+                          <Badge color="yellow">⚠️ Review Needed</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <Text size="small">Account Status</Text>
+                        {getStatusBadge(selectedCustomer)}
+                      </div>
+                      {selectedCustomer.metadata?.verification_date && (
+                        <Text size="small" className="text-gray-600">
+                          Verified: {new Date(selectedCustomer.metadata.verification_date).toLocaleDateString()}
+                        </Text>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Customer Notes Management */}
+                {canManageCustomers && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Customer Notes (Database Stored)</Text>
+                    <div className="mt-3 space-y-3">
+                      <Textarea
+                        placeholder="Add a note about this customer..."
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        rows={3}
+                      />
+                      <Button
+                        onClick={handleAddNote}
+                        size="small"
+                        disabled={!newNote.trim()}
+                      >
+                        Save Note to Database
+                      </Button>
+                      <div className="p-3 bg-gray-50 rounded">
+                        <Text size="small" weight="plus">Current Notes:</Text>
+                        <Text size="small">
+                          {selectedCustomer.metadata?.notes || 'No notes in database yet.'}
+                        </Text>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Compliance Actions */}
+                {canManageCustomers && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Compliance Management Actions</Text>
+                    <div className="mt-3 flex gap-2">
+                      <Button
+                        variant="primary"
+                        size="small"
+                        onClick={() => handleUpdateCustomer(selectedCustomer.id, {
+                          age_verified: 'true',
+                          verification_date: new Date().toISOString()
+                        })}
+                        disabled={selectedCustomer.metadata?.age_verified === 'true'}
+                      >
+                        Verify Age (21+)
+                      </Button>
+                      <Button
+                        variant="secondary"
+                        size="small"
+                        onClick={() => handleUpdateCustomer(selectedCustomer.id, {
+                          cannabis_compliant: 'true',
+                          compliance_check_date: new Date().toISOString()
+                        })}
+                        disabled={selectedCustomer.metadata?.cannabis_compliant === 'true'}
+                      >
+                        Mark Cannabis Compliant
+                      </Button>
+                      <Button
+                        variant="danger"
+                        size="small"
+                        onClick={() => handleStatusChange(selectedCustomer.id, 'flagged')}
+                        disabled={selectedCustomer.metadata?.status === 'flagged'}
+                      >
+                        Flag Account
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Container>
+          </div>
+        )}
+      </div>
+    </Container>
+  )
+}
+
+// ✅ Official Medusa v2 Route Configuration
+export const config = defineRouteConfig({
+  label: "👥 Cannabis Customers",
+})
+
+export default CannabisCustomersPage
+
+EOF
+
+echo "✅ Cannabis customers management page created with real database integration"
+```
+
+---
+
+# Phase 3.7.6: Cannabis Products Management Page (1.5 hours)
+
+## Overview
+Create a dedicated cannabis products management page in the Medusa admin that provides role-based access to product operations. This page will use real Medusa v2 PRODUCT service APIs and implement cannabis-specific product workflows with proper batch tracking and COA management.
+
+**✅ Based on Official Documentation:**
+- **Medusa v2 UI Routes:** Official admin page structure using defineRouteConfig
+- **PRODUCT Module:** Official Medusa v2 service for product management
+- **@medusajs/ui Components:** Official UI components for consistent design
+- **Cannabis Role System:** Uses existing cannabis user metadata for permissions
+
+## Prerequisites
+- Cannabis admin system completed (Phase 3.7.1-3.7.5)
+- Cannabis role system with permissions in database
+- Real Medusa v2 PRODUCT service available
+
+---
+
+## Step 3.7.6: Create Cannabis Products Management Page
+
+### Create Products Management Page with Role-Based Access
+
+```bash
+cd /Users/zachwieder/Documents/🗂️\ AGENCY/Cole\ Boban/thca-multistore-repos/thca-multistore-backend
+
+# Create products management admin page
+mkdir -p src/admin/routes/cannabis-products
+
+cat > src/admin/routes/cannabis-products/page.tsx << 'EOF'
+// Cannabis Products Management - Official Medusa v2 UI Route Pattern
+// Uses real PRODUCT service with cannabis role-based permissions
+// Reference: https://docs.medusajs.com/learn/customization/customize-admin
+
+import { defineRouteConfig } from "@medusajs/admin-sdk"
+import { Container, Heading, Button, Input, Select, Badge, Text, Label, Textarea } from "@medusajs/ui"
+import React, { useState, useEffect } from "react"
+
+// Real Medusa v2 Product Interface (matches database schema)
+interface MedusaProduct {
+  id: string
+  title: string
+  handle: string
+  status: string
+  created_at: string
+  updated_at: string
+  description?: string
+  thumbnail?: string
+  weight?: number
+  length?: number
+  height?: number
+  width?: number
+  collection_id?: string
+  type_id?: string
+  metadata?: {
+    cannabis_type?: string
+    thc_content?: string
+    cbd_content?: string
+    batch_number?: string
+    coa_file?: string
+    coa_file_url?: string
+    coa_last_updated?: string
+    coa_qr_code_url?: string
+    cannabis_compliant?: string
+    product_category?: string
+  }
+  variants?: Array<{
+    id: string
+    title: string
+    sku?: string
+    inventory_quantity: number
+    prices: Array<{
+      amount: number
+      currency_code: string
+    }>
+    metadata?: {
+      weight?: string
+      potency?: string
+    }
+  }>
+}
+
+const CannabisProductsPage = () => {
+  const [products, setProducts] = useState<MedusaProduct[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [typeFilter, setTypeFilter] = useState<string>('all')
+  const [selectedProduct, setSelectedProduct] = useState<MedusaProduct | null>(null)
+
+  // Fetch current user to check permissions
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        // Get current admin user session to check cannabis permissions
+        const userResponse = await fetch('/admin/auth/session', {
+          credentials: 'include'
+        })
+
+        if (userResponse.ok) {
+          const userData = await userResponse.json()
+          setCurrentUser(userData.user)
+        }
+      } catch (error) {
+        console.error('Failed to get current user:', error)
+      }
+    }
+
+    fetchCurrentUser()
+  }, [])
+
+  // Fetch real products from Medusa v2 database
+  useEffect(() => {
+    const fetchRealProducts = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // ✅ Fetch real products from Medusa v2 PRODUCT service
+        const response = await fetch('/admin/products', {
+          credentials: 'include'
+        })
+
+        if (!response.ok) {
+          throw new Error(\`Products API failed: \${response.status}\`)
+        }
+
+        const productsData = await response.json()
+        console.log('Real products from database:', productsData)
+
+        setProducts(productsData.products || [])
+        console.log(\`✅ Loaded \${productsData.products?.length || 0} products from database\`)
+
+      } catch (error) {
+        console.error('Failed to fetch products from database:', error)
+        setError(error instanceof Error ? error.message : 'Failed to load products')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchRealProducts()
+  }, [])
+
+  // Check if current user has permission to manage products
+  const canManageProducts = currentUser?.metadata?.can_manage_products !== false
+
+  // Filter products based on search, status, and type
+  const filteredProducts = products.filter(product => {
+    const matchesSearch =
+      product.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      product.handle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (product.metadata?.batch_number?.toLowerCase().includes(searchTerm.toLowerCase()))
+
+    const matchesStatus = statusFilter === 'all' || product.status === statusFilter
+    const matchesType = typeFilter === 'all' || product.metadata?.cannabis_type === typeFilter
+
+    return matchesSearch && matchesStatus && matchesType
+  })
+
+  // Update product metadata with real database persistence
+  const handleUpdateProduct = async (productId: string, updates: any) => {
+    if (!canManageProducts) {
+      alert('❌ Insufficient permissions to update products')
+      return false
+    }
+
+    try {
+      console.log(\`Updating product \${productId} in database\`, updates)
+
+      // ✅ Update product using Medusa v2 PRODUCT service
+      const response = await fetch(\`/admin/products/\${productId}\`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          metadata: {
+            ...products.find(p => p.id === productId)?.metadata,
+            ...updates,
+            updated_at: new Date().toISOString()
+          }
+        }),
+        credentials: 'include'
+      })
+
+      if (response.ok) {
+        // Update local state after successful database update
+        setProducts(products.map(product =>
+          product.id === productId
+            ? {
+                ...product,
+                metadata: { ...product.metadata, ...updates }
+              }
+            : product
+        ))
+        console.log('✅ Product updated in database')
+        return true
+      } else {
+        const errorData = await response.json()
+        console.error('Failed to update product:', errorData)
+        alert(\`❌ Failed to update product: \${errorData.message || 'Database error'}\`)
+        return false
+      }
+    } catch (error) {
+      console.error('Error updating product:', error)
+      alert('❌ Failed to update product - database connection error')
+      return false
+    }
+  }
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'published':
+        return <Badge color="green">✅ Published</Badge>
+      case 'draft':
+        return <Badge color="yellow">📝 Draft</Badge>
+      case 'proposed':
+        return <Badge color="blue">💡 Proposed</Badge>
+      case 'rejected':
+        return <Badge color="red">❌ Rejected</Badge>
+      default:
+        return <Badge color="grey">{status}</Badge>
+    }
+  }
+
+  const getComplianceBadge = (product: MedusaProduct) => {
+    const isCompliant = product.metadata?.cannabis_compliant === 'true'
+    const hasCOA = product.metadata?.coa_file || product.metadata?.coa_file_url
+    const hasBatch = product.metadata?.batch_number
+
+    if (isCompliant && hasCOA && hasBatch) {
+      return <Badge color="green">🌿 Cannabis Compliant</Badge>
+    } else if (!hasCOA) {
+      return <Badge color="red">❌ COA Required</Badge>
+    } else if (!hasBatch) {
+      return <Badge color="red">❌ Batch Number Required</Badge>
+    } else {
+      return <Badge color="yellow">⚠️ Compliance Review Needed</Badge>
+    }
+  }
+
+  const getCannabisTypeBadge = (type?: string) => {
+    switch (type) {
+      case 'flower':
+        return <Badge color="green">🌸 Flower</Badge>
+      case 'edible':
+        return <Badge color="purple">🍯 Edible</Badge>
+      case 'concentrate':
+        return <Badge color="orange">💎 Concentrate</Badge>
+      case 'vape':
+        return <Badge color="blue">💨 Vape</Badge>
+      default:
+        return <Badge color="grey">📦 Product</Badge>
+    }
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Cannabis Products - Error</Heading>
+          <Badge color="red">❌ Database Error</Badge>
+        </div>
+        <div className="px-6 py-6">
+          <div className="text-red-600">
+            Failed to load products: {error}
+          </div>
+          <div className="text-sm text-gray-600 mt-2">
+            Please check backend connection and authentication.
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  // Loading state
+  if (loading) {
+    return (
+      <Container className="divide-y p-0">
+        <div className="flex items-center justify-between px-6 py-4">
+          <Heading level="h1">Loading Cannabis Products...</Heading>
+        </div>
+        <div className="px-6 py-8">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          </div>
+        </div>
+      </Container>
+    )
+  }
+
+  return (
+    <Container className="divide-y p-0">
+      <div className="flex items-center justify-between px-6 py-4">
+        <Heading level="h1">📦 Cannabis Products Management</Heading>
+        <div className="flex items-center gap-2">
+          <Badge color="green">✅ Real Database</Badge>
+          <Text size="small">({products.length} products)</Text>
+        </div>
+      </div>
+
+      <div className="px-6 py-6">
+        {/* Search and Filter Controls */}
+        <div className="mb-6 space-y-4">
+          <div className="flex gap-4">
+            <div className="flex-1">
+              <Label>Search Products</Label>
+              <Input
+                placeholder="Search by title, handle, or batch number..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            <div className="w-40">
+              <Label>Status</Label>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <option value="all">All Status</option>
+                <option value="published">Published</option>
+                <option value="draft">Draft</option>
+                <option value="proposed">Proposed</option>
+                <option value="rejected">Rejected</option>
+              </Select>
+            </div>
+            <div className="w-40">
+              <Label>Cannabis Type</Label>
+              <Select value={typeFilter} onValueChange={setTypeFilter}>
+                <option value="all">All Types</option>
+                <option value="flower">Flower</option>
+                <option value="edible">Edible</option>
+                <option value="concentrate">Concentrate</option>
+                <option value="vape">Vape</option>
+              </Select>
+            </div>
+          </div>
+
+          {!canManageProducts && (
+            <div className="p-3 bg-yellow-50 border border-yellow-200 rounded">
+              <Text size="small" className="text-yellow-800">
+                ⚠️ You have read-only access to products. Contact an admin to modify products.
+              </Text>
+            </div>
+          )}
+        </div>
+
+        {/* Products List */}
+        {filteredProducts.length > 0 ? (
+          <div className="space-y-4">
+            {filteredProducts.map((product) => {
+              const primaryVariant = product.variants?.[0]
+              const primaryPrice = primaryVariant?.prices?.[0]
+
+              return (
+                <div key={product.id} className="border rounded-lg p-6">
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      {product.thumbnail && (
+                        <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center">
+                          <img
+                            src={product.thumbnail}
+                            alt={product.title}
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        </div>
+                      )}
+
+                      {/* Product Details */}
+                      <div className="flex-1 space-y-3">
+                        {/* Product Header */}
+                        <div className="flex items-center gap-3">
+                          <Heading level="h3">{product.title}</Heading>
+                          {getStatusBadge(product.status)}
+                          {getCannabisTypeBadge(product.metadata?.cannabis_type)}
+                          {getComplianceBadge(product)}
+                        </div>
+
+                        {/* Product Details Grid */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <Text size="small" weight="plus">Handle</Text>
+                            <Text size="small" className="font-mono">{product.handle}</Text>
+                          </div>
+                          <div>
+                            <Text size="small" weight="plus">Price</Text>
+                            <Text size="small">
+                              {primaryPrice
+                                ? \`\${(primaryPrice.amount / 100).toFixed(2)} \${primaryPrice.currency_code?.toUpperCase()}\`
+                                : 'No price set'
+                              }
+                            </Text>
+                          </div>
+                          <div>
+                            <Text size="small" weight="plus">Inventory</Text>
+                            <Text size="small">
+                              {primaryVariant?.inventory_quantity || 0} units
+                            </Text>
+                          </div>
+                          <div>
+                            <Text size="small" weight="plus">Updated</Text>
+                            <Text size="small">
+                              {new Date(product.updated_at).toLocaleDateString()}
+                            </Text>
+                          </div>
+                        </div>
+
+                        {/* Cannabis-Specific Information */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                          {product.metadata?.batch_number && (
+                            <div>
+                              <Text size="small" weight="plus">Batch Number</Text>
+                              <Text size="small" className="font-mono text-green-600">
+                                {product.metadata.batch_number}
+                              </Text>
+                            </div>
+                          )}
+                          {product.metadata?.thc_content && (
+                            <div>
+                              <Text size="small" weight="plus">THC Content</Text>
+                              <Text size="small">{product.metadata.thc_content}</Text>
+                            </div>
+                          )}
+                          {product.metadata?.cbd_content && (
+                            <div>
+                              <Text size="small" weight="plus">CBD Content</Text>
+                              <Text size="small">{product.metadata.cbd_content}</Text>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* COA Information */}
+                        {(product.metadata?.coa_file || product.metadata?.coa_file_url) && (
+                          <div className="p-3 bg-green-50 border border-green-200 rounded">
+                            <div className="flex items-center gap-2">
+                              <Badge color="green">📋 COA Available</Badge>
+                              {product.metadata?.coa_last_updated && (
+                                <Text size="small" className="text-green-600">
+                                  Updated: {new Date(product.metadata.coa_last_updated).toLocaleDateString()}
+                                </Text>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Product Actions */}
+                    <div className="flex flex-col gap-2 ml-4">
+                      {canManageProducts ? (
+                        <>
+                          <Select
+                            value={product.status}
+                            onValueChange={(newStatus) => {
+                              // Note: Product status updates require more complex logic
+                              // This would typically involve product workflows
+                              console.log(\`Would update product \${product.id} status to \${newStatus}\`)
+                            }}
+                          >
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                            <option value="proposed">Proposed</option>
+                            <option value="rejected">Rejected</option>
+                          </Select>
+                          <Button
+                            variant="secondary"
+                            size="small"
+                            onClick={() => setSelectedProduct(product)}
+                          >
+                            Edit Details
+                          </Button>
+                          <Button
+                            variant="transparent"
+                            size="small"
+                            onClick={() => {
+                              // Toggle cannabis compliance
+                              const newCompliance = product.metadata?.cannabis_compliant !== 'true'
+                              handleUpdateProduct(product.id, {
+                                cannabis_compliant: newCompliance.toString(),
+                                compliance_check_date: new Date().toISOString()
+                              })
+                            }}
+                          >
+                            {product.metadata?.cannabis_compliant === 'true' ? 'Mark Non-Compliant' : 'Mark Compliant'}
+                          </Button>
+                        </>
+                      ) : (
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => setSelectedProduct(product)}
+                        >
+                          View Details
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12 text-gray-500">
+            <div className="text-lg font-medium">
+              {products.length === 0 ? 'No products in database' : 'No products match your filters'}
+            </div>
+            <Text size="small">
+              {products.length === 0
+                ? 'Products will appear here as they are created'
+                : 'Try adjusting your search or filter criteria'
+              }
+            </Text>
+            <div className="mt-2">
+              <Badge color="green">✅ Connected to Medusa v2 PRODUCT service</Badge>
+            </div>
+          </div>
+        )}
+
+        {/* Product Details Modal */}
+        {selectedProduct && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Container className="max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b">
+                <div className="flex items-center justify-between">
+                  <Heading level="h2">Product: {selectedProduct.title}</Heading>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => setSelectedProduct(null)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+
+              <div className="px-6 py-6 space-y-6">
+                {/* Product Information */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <Text weight="plus">Product Details</Text>
+                    <div className="mt-2 space-y-2">
+                      <Text size="small">Database ID: {selectedProduct.id}</Text>
+                      <Text size="small">Handle: {selectedProduct.handle}</Text>
+                      <Text size="small">Status: {selectedProduct.status}</Text>
+                      <Text size="small">
+                        Created: {new Date(selectedProduct.created_at).toLocaleDateString()}
+                      </Text>
+                      <Text size="small">
+                        Updated: {new Date(selectedProduct.updated_at).toLocaleDateString()}
+                      </Text>
+                    </div>
+                  </div>
+                  <div>
+                    <Text weight="plus">Cannabis Information</Text>
+                    <div className="mt-2 space-y-2">
+                      <Text size="small">
+                        Type: {selectedProduct.metadata?.cannabis_type || 'Not specified'}
+                      </Text>
+                      <Text size="small">
+                        THC: {selectedProduct.metadata?.thc_content || 'Not specified'}
+                      </Text>
+                      <Text size="small">
+                        CBD: {selectedProduct.metadata?.cbd_content || 'Not specified'}
+                      </Text>
+                      <Text size="small">
+                        Batch: {selectedProduct.metadata?.batch_number || 'Not assigned'}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cannabis Compliance Status */}
+                <div className="border rounded-lg p-4">
+                  <Text weight="plus">Cannabis Compliance Status</Text>
+                  <div className="mt-3 grid grid-cols-3 gap-4">
+                    <div className="text-center p-3 border rounded">
+                      <Text size="small" weight="plus">Compliance Status</Text>
+                      <div className="mt-2">{getComplianceBadge(selectedProduct)}</div>
+                    </div>
+                    <div className="text-center p-3 border rounded">
+                      <Text size="small" weight="plus">COA Status</Text>
+                      <div className="mt-2">
+                        {selectedProduct.metadata?.coa_file || selectedProduct.metadata?.coa_file_url ? (
+                          <Badge color="green">📋 Available</Badge>
+                        ) : (
+                          <Badge color="red">❌ Missing</Badge>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center p-3 border rounded">
+                      <Text size="small" weight="plus">Batch Tracking</Text>
+                      <div className="mt-2">
+                        {selectedProduct.metadata?.batch_number ? (
+                          <Badge color="green">🔢 Assigned</Badge>
+                        ) : (
+                          <Badge color="red">❌ Missing</Badge>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Product Variants */}
+                {selectedProduct.variants && selectedProduct.variants.length > 0 && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Product Variants ({selectedProduct.variants.length})</Text>
+                    <div className="mt-3 space-y-3">
+                      {selectedProduct.variants.map((variant) => (
+                        <div key={variant.id} className="flex justify-between items-start p-3 bg-gray-50 rounded">
+                          <div className="flex-1">
+                            <Text size="small" weight="plus">{variant.title}</Text>
+                            {variant.sku && (
+                              <Text size="small">SKU: {variant.sku}</Text>
+                            )}
+                            <Text size="small">
+                              Inventory: {variant.inventory_quantity} units
+                            </Text>
+                            {variant.metadata?.weight && (
+                              <Text size="small">Weight: {variant.metadata.weight}</Text>
+                            )}
+                            {variant.metadata?.potency && (
+                              <Text size="small">Potency: {variant.metadata.potency}</Text>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            {variant.prices.map((price) => (
+                              <Text key={price.currency_code} size="small" weight="plus">
+                                \${(price.amount / 100).toFixed(2)} {price.currency_code?.toUpperCase()}
+                              </Text>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cannabis Compliance Actions */}
+                {canManageProducts && (
+                  <div className="border rounded-lg p-4">
+                    <Text weight="plus">Cannabis Compliance Management</Text>
+                    <div className="mt-3 space-y-3">
+                      <div className="flex gap-2">
+                        <Button
+                          variant="primary"
+                          size="small"
+                          onClick={() => handleUpdateProduct(selectedProduct.id, {
+                            cannabis_compliant: 'true',
+                            compliance_check_date: new Date().toISOString()
+                          })}
+                          disabled={selectedProduct.metadata?.cannabis_compliant === 'true'}
+                        >
+                          Mark Compliant
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => {
+                            const batchNumber = prompt('Enter batch number:', selectedProduct.metadata?.batch_number || '')
+                            if (batchNumber) {
+                              handleUpdateProduct(selectedProduct.id, {
+                                batch_number: batchNumber
+                              })
+                            }
+                          }}
+                        >
+                          Update Batch
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="small"
+                          onClick={() => {
+                            const coaUrl = prompt('Enter COA file URL:', selectedProduct.metadata?.coa_file_url || '')
+                            if (coaUrl) {
+                              handleUpdateProduct(selectedProduct.id, {
+                                coa_file_url: coaUrl,
+                                coa_last_updated: new Date().toISOString()
+                              })
+                            }
+                          }}
+                        >
+                          Update COA
+                        </Button>
+                      </div>
+
+                      <div className="text-xs text-gray-600">
+                        💡 For complex product editing (variants, pricing, images), use the main Medusa Products page.
+                        This page focuses on cannabis-specific compliance management.
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </Container>
+          </div>
+        )}
+      </div>
+    </Container>
+  )
+}
+
+// ✅ Official Medusa v2 Route Configuration
+export const config = defineRouteConfig({
+  label: "📦 Cannabis Products",
+})
+
+export default CannabisProductsPage
+
+EOF
+
+echo "✅ Cannabis products management page created with real database integration"
 cat > test-cannabis-compliance-final.sh << 'EOF'
 #!/bin/bash
 
@@ -4101,44 +6021,193 @@ Before proceeding to Phase 3.8:
 # Phase 3.8: Email & Reporting Integration (2 hours)
 
 ## Overview
-Integrate professional email functionality using Resend and implement cannabis business reporting dashboards. Focus on transactional emails, compliance notifications, and business analytics using officially documented APIs and components.
+Integrate professional email functionality using Medusa v2's official Notification Module with Resend provider and implement cannabis business reporting dashboards. Focus on transactional emails, compliance notifications, and business analytics using officially documented Medusa v2 patterns.
 
 **✅ Based on Official Documentation:**
-- **Resend Email Service:** Official React Email templates and transactional email API
-- **Resend Analytics Dashboard:** Built-in email performance tracking and webhooks
-- **React Email Components:** Official responsive email template system
-- **Next.js API Routes:** Official server-side email handling patterns
+- **Medusa v2 Notification Module:** Official notification service with provider system
+- **Resend Provider:** Official Medusa v2 Resend integration pattern
+- **React Email Templates:** Official email template system with Medusa integration
+- **Event-driven Emails:** Official Medusa v2 subscriber and workflow patterns
+- **Cannabis Compliance:** Role-based notification permissions and cannabis-specific templates
 
 ## Prerequisites
-- Phase 3.7 completed successfully (80%+ admin test pass rate)
-- Master admin configuration and user management functional
-- Dashboard and CRM components working
+- Cannabis admin system completed (Phase 3.7.1-3.7.6)
+- 5 cannabis admin pages functional (config, users, orders, customers, products)
+- Cannabis role system with permissions in database
+- Real Medusa v2 services integration working
 
 ---
 
-## Step 3.8.1: Install and Configure Resend Email Service
+## Step 3.8.1: Configure Medusa v2 Notification Module with Resend Provider
 
-### Install Resend Dependencies (Official Method)
+### Install Notification Dependencies (Official Medusa v2 Method)
 
 ```bash
 cd /Users/zachwieder/Documents/🗂️\ AGENCY/Cole\ Boban/thca-multistore-repos/thca-multistore-backend
 
-# Install Resend and React Email (Official Packages)
+# Install Medusa v2 notification dependencies
 npm install resend @react-email/components
 npm install @types/react-email
 
-echo "✅ Resend email service installed with official packages"
+echo "✅ Medusa v2 notification dependencies installed"
 ```
 
-### Configure Resend Environment Variables
+### Create Resend Notification Provider (Official Medusa v2 Pattern)
 
 ```bash
-# Add Resend configuration to backend environment
+# Create Resend notification provider using official Medusa v2 pattern
+mkdir -p src/modules/resend
+
+cat > src/modules/resend/index.ts << 'EOF'
+// Cannabis Resend Notification Provider - Official Medusa v2 Pattern
+// Reference: https://docs.medusajs.com/resources/integrations/guides/resend
+
+import { AbstractNotificationProviderService } from "@medusajs/framework/utils"
+import { Logger } from "@medusajs/framework/types"
+import { Resend } from "resend"
+
+type InjectedDependencies = {
+  logger: Logger
+}
+
+interface ResendProviderOptions {
+  channels: string[]
+  api_key: string
+  from: string
+}
+
+type NotificationData = {
+  to: string
+  template: string
+  data: Record<string, any>
+}
+
+class ResendNotificationProviderService extends AbstractNotificationProviderService {
+  protected logger_: Logger
+  protected resend_: Resend
+  protected options_: ResendProviderOptions
+
+  constructor({ logger }: InjectedDependencies, options: ResendProviderOptions) {
+    super()
+    this.logger_ = logger
+    this.options_ = options
+    this.resend_ = new Resend(options.api_key)
+  }
+
+  async send(notification: NotificationData): Promise<{ success: boolean; data?: any }> {
+    try {
+      console.log('Sending cannabis notification via Resend:', notification)
+
+      // ✅ Send email using official Resend API
+      const result = await this.resend_.emails.send({
+        from: this.options_.from,
+        to: [notification.to],
+        subject: this.getEmailSubject(notification.template, notification.data),
+        react: await this.getEmailTemplate(notification.template, notification.data),
+        // Cannabis compliance tags for email tracking
+        tags: [
+          { name: 'type', value: notification.template },
+          { name: 'cannabis_business', value: 'true' },
+          { name: 'compliance_required', value: 'true' }
+        ]
+      })
+
+      if (result.error) {
+        this.logger_.error('Resend email error:', result.error)
+        return { success: false }
+      }
+
+      this.logger_.info('Cannabis email sent successfully:', result.data?.id)
+      return { success: true, data: result.data }
+
+    } catch (error) {
+      this.logger_.error('Failed to send cannabis email:', error)
+      return { success: false }
+    }
+  }
+
+  private getEmailSubject(template: string, data: any): string {
+    switch (template) {
+      case 'cannabis-order-confirmation':
+        return \`Cannabis Order #\${data.orderNumber} Confirmed - \${data.storeName}\`
+      case 'cannabis-welcome':
+        return \`Welcome to \${data.storeName} - Cannabis Customer Onboarding\`
+      case 'cannabis-compliance-alert':
+        return \`Cannabis Compliance Alert - Action Required\`
+      default:
+        return 'Cannabis Business Notification'
+    }
+  }
+
+  private async getEmailTemplate(template: string, data: any) {
+    // ✅ Dynamic import of React Email templates
+    try {
+      switch (template) {
+        case 'cannabis-order-confirmation':
+          const { CannabisOrderConfirmationEmail } = await import('../../emails/templates/cannabis-order-confirmation')
+          return CannabisOrderConfirmationEmail(data)
+        case 'cannabis-welcome':
+          const { CannabisWelcomeEmail } = await import('../../emails/templates/cannabis-welcome')
+          return CannabisWelcomeEmail(data)
+        case 'cannabis-compliance-alert':
+          const { CannabisComplianceAlertEmail } = await import('../../emails/templates/cannabis-compliance-alert')
+          return CannabisComplianceAlertEmail(data)
+        default:
+          // Fallback template for unknown types
+          return \`<div><h1>Cannabis Business Notification</h1><p>\${JSON.stringify(data)}</p></div>\`
+      }
+    } catch (error) {
+      this.logger_.error('Failed to load email template:', error)
+      return \`<div><h1>Cannabis Business Notification</h1><p>Template error occurred</p></div>\`
+    }
+  }
+}
+
+export default ResendNotificationProviderService
+
+EOF
+
+echo "✅ Resend notification provider created with official Medusa v2 pattern"
+```
+
+### Update Medusa Configuration with Notification Module
+
+```bash
+# Update medusa-config.ts with official notification module configuration
+cat >> medusa-config.ts << 'EOF'
+
+  // ✅ Official Medusa v2 Notification Module Configuration
+  {
+    resolve: "@medusajs/medusa/notification",
+    options: {
+      providers: [
+        {
+          resolve: "./src/modules/resend",
+          id: "resend",
+          options: {
+            channels: ["email"],
+            api_key: process.env.RESEND_API_KEY,
+            from: \`\${process.env.RESEND_FROM_NAME} <\${process.env.RESEND_FROM_EMAIL}>\`,
+          },
+        },
+      ],
+    },
+  },
+
+EOF
+
+echo "✅ Medusa v2 notification module configured with Resend provider"
+```
+
+### Configure Cannabis Email Environment Variables
+
+```bash
+# Add cannabis email configuration to backend environment
 cat >> .env << 'EOF'
 
-# Resend Email Service (Cannabis-Friendly)
-# Official Resend API configuration
-RESEND_API_KEY=re_JdN14bry_8pEmFsg3AkdABYmfF7tKrEK4
+# ✅ Medusa v2 Notification Module Configuration
+# Official Resend provider settings
+RESEND_API_KEY=re_REPLACE_WITH_REAL_RESEND_KEY
 RESEND_FROM_EMAIL=noreply@yourdomain.com
 RESEND_FROM_NAME=Your Cannabis Business
 
@@ -4147,13 +6216,13 @@ CANNABIS_COMPLIANCE_EMAIL=compliance@yourdomain.com
 CANNABIS_SUPPORT_EMAIL=support@yourdomain.com
 CANNABIS_ALERTS_EMAIL=alerts@yourdomain.com
 
-# Email Template Settings
+# Email Template Settings (for React Email)
 EMAIL_BASE_URL=https://your-backend.railway.app
 EMAIL_LOGO_URL=https://your-backend.railway.app/logo.png
 
 EOF
 
-echo "✅ Resend environment variables configured for cannabis business"
+echo "✅ Cannabis email environment variables configured for Medusa v2 notification module"
 ```
 
 ---

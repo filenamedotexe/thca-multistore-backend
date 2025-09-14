@@ -23,19 +23,27 @@ export const GET = async (
     const salesChannelService = req.scope.resolve(Modules.SALES_CHANNEL)
     const apiKeyService = req.scope.resolve(Modules.API_KEY)
 
-    // Fetch real sales channels from database
-    const salesChannels = await salesChannelService.listSalesChannels()
+    // Fetch real sales channels from database using correct v2 methods
+    const salesChannels = await salesChannelService.listSalesChannels({}, { take: 100 })
     console.log('Real sales channels from database:', salesChannels)
 
-    // Fetch real API keys from database
-    const apiKeys = await apiKeyService.listApiKeys({ type: "publishable" })
+    // Fetch real API keys from database using correct v2 methods
+    const apiKeys = await apiKeyService.listApiKeys({ type: "publishable" }, { take: 100 })
     console.log('Real API keys from database:', apiKeys)
 
-    // Transform to our store format using real database data
+    // Transform to our store format using real database data with improved key matching
     const stores: StoreConfig[] = salesChannels.map((channel: any) => {
-      const apiKey = apiKeys.find((key: any) =>
-        key.title?.toLowerCase().includes(channel.name?.toLowerCase())
-      )
+      // More flexible API key matching logic
+      const apiKey = apiKeys.find((key: any) => {
+        if (!key.title) return false
+        const keyTitle = key.title.toLowerCase()
+        const channelName = channel.name?.toLowerCase() || ''
+
+        // Direct match or contains match
+        return keyTitle.includes(channelName) ||
+               channelName.includes(keyTitle) ||
+               keyTitle.includes(channel.metadata?.store_type || '')
+      })
 
       return {
         storeId: channel.id,
