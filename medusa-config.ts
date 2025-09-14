@@ -103,5 +103,23 @@ export default defineConfig({
         ],
       },
     },
+
+    // ✅ Official Medusa v2 Notification Module with Resend Provider
+    {
+      resolve: "@medusajs/medusa/notification",
+      options: {
+        providers: [
+          {
+            resolve: "./src/modules/resend",
+            id: "resend",
+            options: {
+              channels: ["email"],
+              api_key: process.env.RESEND_API_KEY || "re_placeholder_key",
+              from: process.env.RESEND_FROM_EMAIL || "noreply@localhost.com",
+            },
+          },
+        ],
+      },
+    },
   ],
 })

@@ -215,42 +215,42 @@ const BusinessIntelligencePage = () => {
         <div>
           <Heading level="h2">Business Overview (All Stores)</Heading>
           <div className="mt-4 grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="p-4 border rounded-lg text-center">
+            <Container className="p-4 text-center">
               <Text size="small" weight="plus">Total Revenue</Text>
-              <div className="text-2xl font-bold text-green-600">
+              <Heading level="h3" className="text-green-600 mt-2">
                 ${metrics.totalRevenue.toLocaleString()}
-              </div>
+              </Heading>
               <Text size="small" className="text-gray-600">
                 Across all stores
               </Text>
-            </div>
-            <div className="p-4 border rounded-lg text-center">
+            </Container>
+            <Container className="p-4 text-center">
               <Text size="small" weight="plus">Total Orders</Text>
-              <div className="text-2xl font-bold text-blue-600">
+              <Heading level="h3" className="text-blue-600 mt-2">
                 {metrics.totalOrders.toLocaleString()}
-              </div>
+              </Heading>
               <Text size="small" className="text-gray-600">
                 Combined orders
               </Text>
-            </div>
-            <div className="p-4 border rounded-lg text-center">
+            </Container>
+            <Container className="p-4 text-center">
               <Text size="small" weight="plus">Average Order Value</Text>
-              <div className="text-2xl font-bold text-purple-600">
+              <Heading level="h3" className="text-purple-600 mt-2">
                 ${metrics.averageOrderValue.toFixed(2)}
-              </div>
+              </Heading>
               <Text size="small" className="text-gray-600">
                 Weighted average
               </Text>
-            </div>
-            <div className="p-4 border rounded-lg text-center">
+            </Container>
+            <Container className="p-4 text-center">
               <Text size="small" weight="plus">Growth Rate</Text>
-              <div className={`text-2xl font-bold ${metrics.growthRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+              <Heading level="h3" className={`mt-2 ${metrics.growthRate >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {metrics.growthRate >= 0 ? '+' : ''}{metrics.growthRate.toFixed(1)}%
-              </div>
+              </Heading>
               <Text size="small" className="text-gray-600">
                 vs previous period
               </Text>
-            </div>
+            </Container>
           </div>
         </div>
 
@@ -259,7 +259,7 @@ const BusinessIntelligencePage = () => {
           <Heading level="h2">Store Performance Comparison</Heading>
           <div className="mt-4 space-y-4">
             {getStoreRanking(metrics.storeComparison).map((store, index) => (
-              <div key={store.storeId} className="border rounded-lg p-6">
+              <Container key={store.storeId} className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <Heading level="h3">{store.storeName}</Heading>
@@ -275,41 +275,41 @@ const BusinessIntelligencePage = () => {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-                  <div className="text-center">
+                  <Container className="text-center p-3">
                     <Text size="small" weight="plus">Revenue</Text>
-                    <div className="text-lg font-semibold">${store.totalRevenue.toLocaleString()}</div>
+                    <Text className="text-lg font-semibold mt-1">${store.totalRevenue.toLocaleString()}</Text>
                     <Text size="small" className="text-gray-600">
                       {((store.totalRevenue / metrics.totalRevenue) * 100).toFixed(1)}% of total
                     </Text>
-                  </div>
-                  <div className="text-center">
+                  </Container>
+                  <Container className="text-center p-3">
                     <Text size="small" weight="plus">Orders</Text>
-                    <div className="text-lg font-semibold">{store.totalOrders}</div>
+                    <Text className="text-lg font-semibold mt-1">{store.totalOrders}</Text>
                     <Text size="small" className="text-gray-600">
                       {((store.totalOrders / metrics.totalOrders) * 100).toFixed(1)}% of total
                     </Text>
-                  </div>
-                  <div className="text-center">
+                  </Container>
+                  <Container className="text-center p-3">
                     <Text size="small" weight="plus">AOV</Text>
-                    <div className="text-lg font-semibold">${store.averageOrderValue.toFixed(2)}</div>
+                    <Text className="text-lg font-semibold mt-1">${store.averageOrderValue.toFixed(2)}</Text>
                     <Text size="small" className="text-gray-600">
                       {store.averageOrderValue > metrics.averageOrderValue ? '↗️ Above avg' : '↙️ Below avg'}
                     </Text>
-                  </div>
-                  <div className="text-center">
+                  </Container>
+                  <Container className="text-center p-3">
                     <Text size="small" weight="plus">Customers</Text>
-                    <div className="text-lg font-semibold">{store.totalCustomers}</div>
+                    <Text className="text-lg font-semibold mt-1">{store.totalCustomers}</Text>
                     <Text size="small" className="text-gray-600">
                       {((store.totalCustomers / metrics.totalCustomers) * 100).toFixed(1)}% of total
                     </Text>
-                  </div>
-                  <div className="text-center">
+                  </Container>
+                  <Container className="text-center p-3">
                     <Text size="small" weight="plus">Conversion</Text>
-                    <div className="text-lg font-semibold">{store.conversionRate.toFixed(1)}%</div>
+                    <Text className="text-lg font-semibold mt-1">{store.conversionRate.toFixed(1)}%</Text>
                     <Text size="small" className="text-gray-600">
                       {store.conversionRate > metrics.conversionRate ? '↗️ Strong' : '↙️ Optimize'}
                     </Text>
-                  </div>
+                  </Container>
                 </div>
 
                 {/* Top Products for this store */}
@@ -318,15 +318,15 @@ const BusinessIntelligencePage = () => {
                     <Text size="small" weight="plus">Top Products ({timeframe})</Text>
                     <div className="mt-2 grid grid-cols-1 md:grid-cols-3 gap-2">
                       {store.topProducts.slice(0, 3).map((product) => (
-                        <div key={product.id} className="flex justify-between p-2 bg-gray-50 rounded">
+                        <Container key={product.id} className="flex justify-between p-2">
                           <Text size="small">{product.title}</Text>
                           <Text size="small" weight="plus">${product.revenue.toLocaleString()}</Text>
-                        </div>
+                        </Container>
                       ))}
                     </div>
                   </div>
                 )}
-              </div>
+              </Container>
             ))}
           </div>
         </div>
@@ -337,39 +337,39 @@ const BusinessIntelligencePage = () => {
           <div className="mt-4 space-y-3">
             {/* Revenue Leader Insight */}
             {metrics.storeComparison.length > 0 && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded">
+              <Container className="p-4 bg-green-50">
                 <Text weight="plus" className="text-green-800">
-                  💰 Revenue Leader: {getStoreRanking(metrics.storeComparison)[0].storeName}
+                  Revenue Leader: {getStoreRanking(metrics.storeComparison)[0].storeName}
                 </Text>
                 <Text size="small" className="text-green-700">
                   Generating ${getStoreRanking(metrics.storeComparison)[0].totalRevenue.toLocaleString()}
                   ({((getStoreRanking(metrics.storeComparison)[0].totalRevenue / metrics.totalRevenue) * 100).toFixed(1)}% of total revenue)
                 </Text>
-              </div>
+              </Container>
             )}
 
             {/* Growth Opportunity */}
             {metrics.growthRate < 10 && (
-              <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
+              <Container className="p-4 bg-yellow-50">
                 <Text weight="plus" className="text-yellow-800">
-                  📈 Growth Opportunity: {metrics.growthRate.toFixed(1)}% growth rate
+                  Growth Opportunity: {metrics.growthRate.toFixed(1)}% growth rate
                 </Text>
                 <Text size="small" className="text-yellow-700">
                   Consider marketing campaigns or product optimization to accelerate growth
                 </Text>
-              </div>
+              </Container>
             )}
 
             {/* Conversion Optimization */}
             {metrics.conversionRate < 3 && (
-              <div className="p-4 bg-blue-50 border border-blue-200 rounded">
+              <Container className="p-4 bg-blue-50">
                 <Text weight="plus" className="text-blue-800">
-                  🎯 Conversion Optimization: {metrics.conversionRate.toFixed(1)}% overall conversion
+                  Conversion Optimization: {metrics.conversionRate.toFixed(1)}% overall conversion
                 </Text>
                 <Text size="small" className="text-blue-700">
                   Focus on improving checkout experience and product discovery
                 </Text>
-              </div>
+              </Container>
             )}
           </div>
         </div>
