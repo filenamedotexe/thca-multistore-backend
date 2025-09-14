@@ -115,18 +115,18 @@ const storeConfigs = [
 ✅ **Cannabis Admin UI**: 2 admin pages, 1 dashboard widget, 4 API endpoints
 ✅ **Real Database Integration**: All hardcoded data eliminated - production ready
 
-#### Cannabis Admin Features (Live)
-- **Admin Pages**: cannabis-config, cannabis-users (in sidebar)
+#### Business Intelligence Admin Features (Live)
+- **Admin Pages**: business-intelligence, email-operations (in sidebar)
 - **Dashboard Widget**: Real metrics from database
-- **API Endpoints**: config, stores, metrics, store management
+- **API Endpoints**: business metrics, intelligence, store management, email operations
 - **User Management**: Real database with cannabis metadata
 - **Store Management**: Real sales channel operations
 
 ### Current Working URLs
 - **Backend Admin**: http://localhost:9000/app
-- **Cannabis Config**: http://localhost:9000/app/cannabis-config
-- **Cannabis Users**: http://localhost:9000/app/cannabis-users
-- **API Base**: http://localhost:9000/admin/cannabis/*
+- **Business Intelligence**: http://localhost:9000/app/business-intelligence
+- **Email Operations**: http://localhost:9000/app/email-operations
+- **API Base**: http://localhost:9000/admin/business/* | http://localhost:9000/admin/email/*
 
 #### API Key Module (Official v2 API)
 - **Service Resolution**: `container.resolve(Modules.API_KEY)`
@@ -147,11 +147,11 @@ const storeConfigs = [
 - **Configuration Storage**: Real STORE service metadata persistence
 
 ### Current APIs (Live)
-- **GET /admin/cannabis/config**: Real store configuration from database
-- **POST /admin/cannabis/config**: Database persistence for business settings
-- **GET /admin/cannabis/stores**: Real sales channels with API keys
-- **PATCH /admin/cannabis/stores/[id]**: Real store enable/disable operations
-- **GET /admin/cannabis/metrics**: Real metrics calculated from database
+- **GET /admin/business/metrics**: Real business metrics calculated from database
+- **GET /admin/business/intelligence**: Business intelligence data and analytics
+- **GET /admin/business/stores**: Real sales channels with API keys and store management
+- **GET /admin/email/templates**: Email template management and operations
+- **POST /admin/email/send**: Email sending operations with multi-domain support
 
 ### Common Errors & Solutions
 1. **API Route Import**: Use `import type { Request, Response } from "express"`
