@@ -866,11 +866,11 @@ const EmailOperationsPage = () => {
                           <div className="grid grid-cols-3 gap-4">
                             <div className="text-center">
                               <Text size="small" weight="plus">Emails Sent</Text>
-                              <div className="text-lg font-semibold">{storeData?.sent || 0}</div>
+                              <Text className="text-lg font-semibold">{storeData?.sent || 0}</Text>
                             </div>
                             <div className="text-center">
                               <Text size="small" weight="plus">Active Templates</Text>
-                              <div className="text-lg font-semibold">{emailTemplates.length}</div>
+                              <Text className="text-lg font-semibold">{emailTemplates.length}</Text>
                             </div>
                             <div className="text-center">
                               <Text size="small" weight="plus">Last Activity</Text>

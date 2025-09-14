@@ -33,7 +33,7 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     this.resend_ = new Resend(options.api_key)
   }
 
-  async send(notification: NotificationData): Promise<{ success: boolean; data?: any }> {
+  async send(notification: any): Promise<{ success: boolean; data?: any }> {
     try {
       console.log('Sending email via Resend:', notification.template, 'to:', notification.to)
 
@@ -57,7 +57,7 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
       return { success: true, data: result.data }
 
     } catch (error) {
-      this.logger_.error('Failed to send email via Resend:', error)
+      this.logger_.error('Failed to send email via Resend:', error instanceof Error ? error : new Error(String(error)))
       return { success: false }
     }
   }
@@ -66,9 +66,9 @@ class ResendNotificationProviderService extends AbstractNotificationProviderServ
     try {
       // ✅ Dynamic template import based on template name
       const TemplateComponent = await import(`../../../email-templates/${template}`)
-      return TemplateComponent.default(data)
+      return await TemplateComponent.default(data)
     } catch (error) {
-      this.logger_.error(`Template not found: ${template}`, error)
+      this.logger_.error(`Template not found: ${template}`, error instanceof Error ? error : new Error(String(error)))
       // Fallback to simple text template
       return `
         <div style="font-family: Arial, sans-serif; padding: 20px;">
