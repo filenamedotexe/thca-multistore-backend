@@ -44,7 +44,7 @@ export const POST = async (
 
       const TemplateComponent = await import(templatePath)
 
-      // Generate sample test data based on template type
+      // Generate comprehensive sample test data for all template types
       const sampleData = test_data || {
         order: {
           display_id: 1001,
@@ -59,9 +59,19 @@ export const POST = async (
               title: 'Sample Product',
               quantity: 1,
               unit_price: 4500,
-              total: 4500
+              total: 4500,
+              refunded_quantity: 1
             }
-          ]
+          ],
+          shipping_address: {
+            first_name: 'Test',
+            last_name: 'Customer',
+            address_1: '123 Test St',
+            city: 'Chicago',
+            province: 'IL',
+            postal_code: '60601',
+            country_code: 'US'
+          }
         },
         customer: {
           first_name: 'Test',
@@ -69,7 +79,42 @@ export const POST = async (
           email: to
         },
         store_name: store_name,
-        store_domain: 'localhost:9000'
+        store_domain: 'localhost:9000',
+        // Additional data for all template types
+        shipping: {
+          tracking_number: 'TEST123456789',
+          carrier: 'Test Carrier',
+          estimated_delivery: 'September 16, 2025',
+          tracking_url: 'https://test-carrier.com/track/TEST123456789'
+        },
+        delivery: {
+          delivered_at: new Date().toISOString(),
+          delivery_method: 'Test Delivery',
+          signature_required: true,
+          delivered_to: 'Front Door'
+        },
+        payment: {
+          method: 'Test Credit Card',
+          failure_reason: 'Test failure for demo',
+          retry_url: 'https://localhost:9000/retry-payment'
+        },
+        cancellation: {
+          reason: 'Test cancellation',
+          cancelled_by: 'customer',
+          refund_amount: 5000,
+          refund_method: 'Original payment method',
+          refund_timeline: '3-5 business days'
+        },
+        refund: {
+          amount: 5000,
+          method: 'Test Credit Card',
+          transaction_id: 'TEST-REF-123456789',
+          processing_time: '3-5 business days',
+          reason: 'Test refund',
+          partial: false
+        },
+        reset_url: 'https://localhost:9000/reset-password?token=test123',
+        expiry_time: '24 hours'
       }
 
       // ✅ Render email template to HTML

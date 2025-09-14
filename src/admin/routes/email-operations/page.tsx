@@ -75,12 +75,10 @@ const EmailOperationsPage = () => {
   const [testEmail, setTestEmail] = useState('')
   const [selectedTemplate, setSelectedTemplate] = useState('order-confirmation')
   const [testResult, setTestResult] = useState<string | null>(null)
-  const [showCreateTemplate, setShowCreateTemplate] = useState(false)
-  const [newTemplateName, setNewTemplateName] = useState('')
-  const [newTemplateType, setNewTemplateType] = useState<'order' | 'customer' | 'marketing'>('order')
-  const [newTemplateSubject, setNewTemplateSubject] = useState('')
-  const [createTemplateResult, setCreateTemplateResult] = useState<string | null>(null)
   const [showFullAnalytics, setShowFullAnalytics] = useState(false)
+  const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null)
+  const [templateContent, setTemplateContent] = useState('')
+  const [editResult, setEditResult] = useState<string | null>(null)
 
   // Update Chicago time every second for consistency with business intelligence
   useEffect(() => {
@@ -413,118 +411,11 @@ const EmailOperationsPage = () => {
           <div className="space-y-8">
             <div className="flex items-center justify-between">
               <Heading level="h2">React Email Templates</Heading>
-              <Button
-                variant="primary"
-                size="small"
-                onClick={() => setShowCreateTemplate(!showCreateTemplate)}
-              >
-                {showCreateTemplate ? 'Cancel' : 'Create New Template'}
-              </Button>
+              <Text size="small" className="text-gray-600">
+                Professional transactional email templates
+              </Text>
             </div>
 
-            {/* Create Template Form */}
-            {showCreateTemplate && (
-              <Container className="border rounded-lg p-6 bg-gray-50">
-                <Heading level="h3" className="mb-4">Create New Email Template</Heading>
-                <div className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Template Name</Label>
-                      <Input
-                        placeholder="e.g. Order Shipped"
-                        value={newTemplateName}
-                        onChange={(e) => setNewTemplateName(e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label>Template Type</Label>
-                      <Select value={newTemplateType} onValueChange={(value: string) => setNewTemplateType(value as 'order' | 'customer' | 'marketing')}>
-                        <option value="order">Order Related</option>
-                        <option value="customer">Customer Related</option>
-                        <option value="marketing">Marketing</option>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label>Email Subject</Label>
-                      <Input
-                        placeholder="e.g. Your order has shipped!"
-                        value={newTemplateSubject}
-                        onChange={(e) => setNewTemplateSubject(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Button
-                      variant="primary"
-                      size="small"
-                      onClick={async () => {
-                        try {
-                          setCreateTemplateResult('Creating template...')
-
-                          const response = await fetch('/admin/email/templates', {
-                            method: 'POST',
-                            headers: {
-                              'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                              name: newTemplateName,
-                              type: newTemplateType,
-                              subject: newTemplateSubject,
-                              content: 'Template content will be generated based on type.'
-                            }),
-                            credentials: 'include'
-                          })
-
-                          const result = await response.json()
-
-                          if (response.ok) {
-                            setCreateTemplateResult(`✅ Template "${newTemplateName}" created successfully!`)
-                            setNewTemplateName('')
-                            setNewTemplateSubject('')
-                            // Refresh templates list
-                            const templatesResponse = await fetch('/admin/email/templates', {
-                              credentials: 'include'
-                            })
-                            if (templatesResponse.ok) {
-                              const templatesData = await templatesResponse.json()
-                              setEmailTemplates(templatesData.templates || [])
-                            }
-                          } else {
-                            setCreateTemplateResult(`❌ ${result.error}`)
-                          }
-                        } catch (error) {
-                          setCreateTemplateResult('❌ Failed to create template')
-                        }
-                      }}
-                      disabled={!newTemplateName || !newTemplateSubject}
-                    >
-                      Create Template
-                    </Button>
-                    <Button
-                      variant="secondary"
-                      size="small"
-                      onClick={() => {
-                        setShowCreateTemplate(false)
-                        setCreateTemplateResult(null)
-                        setNewTemplateName('')
-                        setNewTemplateSubject('')
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-
-                  {createTemplateResult && (
-                    <Container className={`p-3 ${createTemplateResult.startsWith('✅') ? 'bg-green-50' : 'bg-red-50'}`}>
-                      <Text size="small" className={createTemplateResult.startsWith('✅') ? 'text-green-800' : 'text-red-800'}>
-                        {createTemplateResult}
-                      </Text>
-                    </Container>
-                  )}
-                </div>
-              </Container>
-            )}
 
             {emailTemplates.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -549,9 +440,27 @@ const EmailOperationsPage = () => {
                       <Button
                         variant="secondary"
                         size="small"
-                        onClick={() => {
-                          // TODO: Implement inline template editor
-                          alert(`Edit functionality coming soon for ${template.name}`)
+                        onClick={async () => {
+                          try {
+                            setEditResult('Loading template...')
+                            setEditingTemplate(template)
+
+                            // Fetch template source code
+                            const response = await fetch(`/admin/email/templates/edit?template=${template.id}`, {
+                              credentials: 'include'
+                            })
+
+                            if (response.ok) {
+                              const data = await response.json()
+                              setTemplateContent(data.sourceCode)
+                              setEditResult(null)
+                            } else {
+                              const error = await response.json()
+                              setEditResult(`❌ ${error.error}`)
+                            }
+                          } catch (error) {
+                            setEditResult('❌ Failed to load template')
+                          }
                         }}
                       >
                         Edit
@@ -570,15 +479,15 @@ const EmailOperationsPage = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-gray-500">
-                <Text size="large">No email templates configured</Text>
+              <Container className="text-center py-12">
+                <Text size="large">Professional Email Templates Ready</Text>
                 <Text size="small" className="text-gray-400 mb-4">
-                  Create React Email templates for automated workflows
+                  Essential transactional email templates for your multi-store platform
                 </Text>
-                <Button variant="primary">
-                  Create First Template
-                </Button>
-              </div>
+                <Text size="small" className="text-blue-600">
+                  Templates are automatically discovered from the filesystem
+                </Text>
+              </Container>
             )}
           </div>
         )}
@@ -685,8 +594,11 @@ const EmailOperationsPage = () => {
                 <div>
                   <Label>Template</Label>
                   <Select value={selectedTemplate} onValueChange={setSelectedTemplate}>
-                    <option value="order-confirmation">Order Confirmation</option>
-                    <option value="customer-welcome">Customer Welcome</option>
+                    {emailTemplates.map((template) => (
+                      <option key={template.id} value={template.id}>
+                        {template.name}
+                      </option>
+                    ))}
                   </Select>
                 </div>
                 <div>
@@ -779,7 +691,7 @@ const EmailOperationsPage = () => {
               size="small"
               onClick={() => setActiveTab('templates')}
             >
-              Template Designer
+              Manage Templates
             </Button>
           </div>
           <Text size="small" className="text-gray-600 mt-2">
@@ -887,6 +799,136 @@ const EmailOperationsPage = () => {
                     })}
                   </div>
                 </div>
+              </div>
+            </Container>
+          </div>
+        )}
+
+        {/* Template Edit Modal */}
+        {editingTemplate && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <Container className="max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+              <div className="px-6 py-4 border-b">
+                <div className="flex items-center justify-between">
+                  <Heading level="h2">Edit Template: {editingTemplate.name}</Heading>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => {
+                      setEditingTemplate(null)
+                      setTemplateContent('')
+                      setEditResult(null)
+                    }}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+
+              <div className="px-6 py-6 space-y-6">
+                {/* Template Info */}
+                <div>
+                  <Text weight="plus">Template: {editingTemplate.name}</Text>
+                  <Text size="small" className="text-gray-600">
+                    Type: {editingTemplate.type} | Subject: {editingTemplate.subject}
+                  </Text>
+                </div>
+
+                {/* Source Code Editor */}
+                <div>
+                  <Label>React Email Template Source Code</Label>
+                  <Textarea
+                    value={templateContent}
+                    onChange={(e) => setTemplateContent(e.target.value)}
+                    rows={20}
+                    className="font-mono text-sm"
+                    placeholder="Loading template source code..."
+                  />
+                </div>
+
+                {/* Edit Actions */}
+                <div className="flex gap-3">
+                  <Button
+                    variant="primary"
+                    size="small"
+                    onClick={async () => {
+                      try {
+                        setEditResult('Saving template...')
+
+                        const response = await fetch(`/admin/email/templates/edit?template=${editingTemplate.id}`, {
+                          method: 'PUT',
+                          headers: {
+                            'Content-Type': 'application/json'
+                          },
+                          body: JSON.stringify({
+                            content: templateContent
+                          }),
+                          credentials: 'include'
+                        })
+
+                        const result = await response.json()
+
+                        if (response.ok) {
+                          setEditResult(`✅ ${result.message}`)
+                          // Refresh templates list
+                          const templatesResponse = await fetch('/admin/email/templates', {
+                            credentials: 'include'
+                          })
+                          if (templatesResponse.ok) {
+                            const templatesData = await templatesResponse.json()
+                            setEmailTemplates(templatesData.templates || [])
+                          }
+                        } else {
+                          setEditResult(`❌ ${result.error}`)
+                        }
+                      } catch (error) {
+                        setEditResult('❌ Failed to save template')
+                      }
+                    }}
+                    disabled={!templateContent.trim()}
+                  >
+                    Save Changes
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => {
+                      window.open(`/admin/email/templates/preview?template=${editingTemplate.id}`, '_blank')
+                    }}
+                  >
+                    Preview
+                  </Button>
+                  <Button
+                    variant="secondary"
+                    size="small"
+                    onClick={() => {
+                      setEditingTemplate(null)
+                      setTemplateContent('')
+                      setEditResult(null)
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+
+                {editResult && (
+                  <Container className={`p-3 ${editResult.startsWith('✅') ? 'bg-green-50' : 'bg-red-50'}`}>
+                    <Text size="small" className={editResult.startsWith('✅') ? 'text-green-800' : 'text-red-800'}>
+                      {editResult}
+                    </Text>
+                  </Container>
+                )}
+
+                {/* Help Text */}
+                <Container className="p-4 bg-blue-50">
+                  <Text size="small" className="text-blue-800">
+                    <strong>Editing Tips:</strong><br />
+                    • Use dynamic variables like {`{customer.first_name}`}, {`{order.display_id}`}, {`{store_name}`}<br />
+                    • Maintain React Email component structure<br />
+                    • Test changes with Preview before saving<br />
+                    • A backup is automatically created when you save
+                  </Text>
+                </Container>
               </div>
             </Container>
           </div>
